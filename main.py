@@ -1,7 +1,7 @@
 import requests
 import tkinter as tk
 import threading
-from strategy import Context, Strategy
+from strategy import Context, Strategy, ShareBondDifference
 
 """
 Created by MinChengWen on 2020/8/12
@@ -85,7 +85,7 @@ class Window(tk.Tk):
         self.refresh_data(wait_time)
         self.mainloop()
 
-    def refresh_data(self, wait_time=1000 ):
+    def refresh_data(self, wait_time=1000):
         # 需要刷新数据的操作
         # 代码...
         self.notice(self.strategy_list)
@@ -103,7 +103,6 @@ class Window(tk.Tk):
         :return:
         """
         for strategy in strategy_list:
-            print(strategy.make_result())
             t = threading.Thread(strategy.make_result(), args=())
             t.start()
 
@@ -114,14 +113,18 @@ class Window(tk.Tk):
         :return:
         """
         tip_list = []
-        strategy1 = Context(Strategy(threshold=0.01, stock="sh603733", bond="sh113554", convertible_share_price=13.27,
-                                     strategy_name="share_bond_difference"))
-        strategy2 = Context(Strategy(threshold=0.005, stock="sz300059", bond="sz123041", convertible_share_price=13.13,
-                                     strategy_name="share_bond_difference"))
-        strategy3 = Context(Strategy(threshold=0.005, stock="sz000861", bond="sz127003", convertible_share_price=3,
-                                     strategy_name="share_bond_difference"))
-        strategy4 = Context(Strategy(threshold=0.005, stock="sz002567", bond="sz128092", convertible_share_price=8.63,
-                                     strategy_name="share_bond_difference"))
+        strategy1 = Context(
+            ShareBondDifference(threshold=0.01, stock="sh603733", bond="sh113554", convertible_share_price=13.27,
+                                strategy_name="share_bond_difference"))
+        strategy2 = Context(
+            ShareBondDifference(threshold=0.005, stock="sz300059", bond="sz123041", convertible_share_price=13.13,
+                                strategy_name="share_bond_difference"))
+        strategy3 = Context(
+            ShareBondDifference(threshold=0.005, stock="sz000861", bond="sz127003", convertible_share_price=3,
+                                strategy_name="share_bond_difference"))
+        strategy4 = Context(
+            ShareBondDifference(threshold=0.005, stock="sz002567", bond="sz128092", convertible_share_price=8.63,
+                                strategy_name="share_bond_difference"))
         # tip1 = Tip(0.01, "sh603733", "sh113554", 13.27)
         # tip2 = Tip(0.005, "sz300059", "sz123041", 13.13)
         # tip3 = Tip(0.005, "sz000861", "sz127003", 3)

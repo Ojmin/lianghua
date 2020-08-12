@@ -64,8 +64,8 @@ class ShareBondDifference(Strategy):
     抓取信息并实施策略
     """
 
-    def __init__(self):
-        super().__init__()
+    # def __init__(self):
+    #     super().__init__()
 
     def get_result(self):
         headers = {
@@ -78,7 +78,7 @@ class ShareBondDifference(Strategy):
             requests.get("http://hq.sinajs.cn/?format=json&list={0}".format(self.bond), headers=headers).text.split(
                 ",")[3]
         c = self.trans(p1, p2, self.convertible_share_price)
-        print(c,1111)
+        print(c, 222)
         if c < -self.threshold:
             msg = ("买入{0}，卖出{1},p1={2},p2={3},阈值为{4}".format(self.bond, self.stock, p1, p2, c))
             self.l["bg"] = "red"
@@ -105,7 +105,6 @@ class Context(object):
         """初始化策略对象"""
         self.strategy = strategy
 
-    def make_result(self, ):
-        print(1111)
-        print(self.strategy)
-        return self.strategy.get_result()
+    def make_result(self):
+        self.strategy.get_result()
+        return
