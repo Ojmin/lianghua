@@ -1,6 +1,6 @@
 import tkinter as tk
 import threading
-from strategy import Context, Strategy, ShareBondDifference, YangQiETF
+from strategy import Context,  YangQiETF
 
 """
 Created by MinChengWen on 2020/8/12
@@ -59,8 +59,11 @@ class Window(tk.Tk):
         :param tip_thread: 单个股票线程
         :return:
         """
+        t_list = []
         for strategy in strategy_list:
             t = threading.Thread(strategy.make_result(), args=())
+            t_list.append(t)
+        for t in t_list:
             t.start()
 
     @staticmethod
@@ -90,9 +93,8 @@ class Window(tk.Tk):
         # tip_list.append(strategy3)
         # tip_list.append(strategy4)
         # tip_list.append(strategy5)
-        strategy6=Context(YangQiETF("sh515600",-0.002,0.006))
+        strategy6 = Context(YangQiETF("sh515600", "sh515680","sh515900","sz159974",0.004, 0.006))
         tip_list.append(strategy6)
-
         return tip_list
 
     def run(self):
@@ -101,4 +103,4 @@ class Window(tk.Tk):
 
 if __name__ == '__main__':
     aa = Window()
-    aa.refresh_data()
+    aa.refresh_data(wait_time=500)
