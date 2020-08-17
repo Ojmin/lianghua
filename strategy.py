@@ -5,7 +5,7 @@ import tkinter as tk
 import tushare as ts
 
 from my_share import get_yesterday_amount, get_distance_of_delivery_day
-from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider
+from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV
 
 """
 策略模式
@@ -251,6 +251,13 @@ class IF300ETF(Strategy):
         self.spider1 = HS300IndexSpider()  # 沪深300的爬虫
         self.spider2 = IFSpider()  # IF连续的指数
         self.spider3 = HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360")  # 获取沪深300ETF的爬虫
+
+        self.spider4 = HS300IOPV(code1)
+        self.spider5 = HS300IOPV(code2)
+        self.spider6 = HS300IOPV(code3)
+        self.spider7 = HS300IOPV(code4)
+        self.spider8 = HS300IOPV(code5)
+        self.spider9 = HS300IOPV(code6)
         self.var1 = tk.StringVar()  # 文本储存器
         self.l1 = tk.Label(textvar=self.var1, font='Helvetica -30 bold', width=100,
                            height=4)

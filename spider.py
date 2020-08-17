@@ -70,7 +70,7 @@ class HS300IndexSpider(Spider):
     """获取沪深300指数"""
 
     def __init__(self):
-        super(HS300IndexSpider,self).__init__()
+        super(HS300IndexSpider, self).__init__()
         self.driver.get("https://xueqiu.com/S/SH000300")
 
     def get_result(self):
@@ -122,12 +122,6 @@ class HS300ETF(object):
         self.code4 = code4
         self.code5 = code5
         self.code6 = code6
-        self.spider1 = HS300IOPV(code1)
-        self.spider2 = HS300IOPV(code2)
-        self.spider3 = HS300IOPV(code3)
-        self.spider4 = HS300IOPV(code4)
-        self.spider5 = HS300IOPV(code5)
-        self.spider6 = HS300IOPV(code6)
 
         self.headers = {
             'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36',
