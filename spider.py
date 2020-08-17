@@ -4,9 +4,11 @@ from selenium.webdriver.chrome.options import Options
 
 
 class Spider(object):
+    """基类"""
+
     def __init__(self):
         self.options = Options()
-        # self.options.add_argument('--headless')
+        self.options.add_argument('--headless')
         self.options.add_argument("--disable-gpu")
         self.options.add_argument("--hide-scrollbars")
         self.options.add_argument('blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
@@ -26,6 +28,7 @@ class Spider(object):
 
 
 class YangQiIndexSpider(Spider):
+    """央企创新指数爬虫"""
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -45,6 +48,8 @@ class YangQiIndexSpider(Spider):
 
 
 class YangQiETFSpider(Spider):
+    """央企创新ETF爬虫"""
+
     def __init__(self, code):
         super(YangQiETFSpider, self).__init__()
         self.code = code
@@ -56,9 +61,42 @@ class YangQiETFSpider(Spider):
                 '//*[@id="app"]/div[2]/div[2]/div[5]/table/tbody/tr[3]/td[3]/span').text)  # 昨日净值
 
         except Exception as e:
-            print("获取净值失败",e)
+            print("获取净值失败", e)
             return 0.00
         return yesterday_value
+
+
+class IFSpider(Spider):
+    """IF当月连续爬虫"""
+
+    def __init__(self):
+        super(IFSpider, self).__init__()
+        self.driver.get("http://quote.eastmoney.com/gzqh/ifdylx.html")
+
+    def get_result(self):
+        try:
+            if_index = self.driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/div[1]/p[1]/i[1]").text
+        except Exception as e:
+            print("获取当月连续指数失败", e)
+            return "0"
+        print("if_index", if_index)
+        return if_index
+
+
+class HS300ETF(Spider):
+    def __init__(self, code1, code2, code3, code4, code5, code6):
+        super(HS300ETF, self).__init__()
+        self.code1 = code1
+        self.code2 = code2
+        self.code3 = code3
+        self.code4 = code4
+        self.code5 = code5
+        self.code6 = code6
+
+    def get_result(self):
+        requests.get(
+            "http://hq.sinajs.cn/?format=json&list={0},{1},{2},{3},{4},{5}".format(self.code1, self.code2, self.code3,
+                                                                                   self.code4, self.code5, self.code6))
 
 
 if __name__ == '__main__':

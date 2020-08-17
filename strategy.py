@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 import tkinter as tk
 import tushare as ts
@@ -166,8 +168,8 @@ class YangQiETF(Strategy):
         }
         try:
             sell1 = float(requests.get(
-            "http://hq.sinajs.cn/?format=json&list={0}".format(code),
-            headers=headers).text.split(",")[21])
+                "http://hq.sinajs.cn/?format=json&list={0}".format(code),
+                headers=headers).text.split(",")[21])
         except:
             print("sell1获取失败")
             return
@@ -220,6 +222,55 @@ class YangQiETF(Strategy):
                 v[2]["bg"] = "green"
                 v[3].set(msg)
                 continue
+
+
+class IF300ETF(Strategy):
+    """
+    抓取IF当月连续合约实时价格，当月合约到期时间，000300沪深300指数实时价格。
+当月贴水率=（沪深300指数实时价格-IF当月合约实时价格）/沪深300指数实时价格
+当月年化贴水率=当月贴水率*365/当月合约到期时间
+当月年化贴水率大于8%时，显示红色
+当月年化贴水率介于6%至8%时，显示黄色
+当月年化贴水率小于2%时，显示蓝色
+
+
+抓取ETF基金510300，510310，510380，159919，515660，515360实时买一盘口价，卖一盘口价，实时IOPV，成交量。
+当IF显示蓝色时，抓取的这些基金的（卖一盘口价/IOPV-1）里面最小值+0.1%的所有数据，成交量最大的基金显示青色。
+当IF显示红色时，抓取的这些基金的（买一盘口价/IOPV-1）里面最大值-0.1%的所有数据，成交量最大的基金显示橙色。
+    """
+
+    def __init__(self, code1, code2, code3, code4, code5, code6):
+        super(IF300ETF).__init__()
+        self.current_month = datetime.datetime.now().month
+        self.code1 = code1
+        self.code2 = code2
+        self.code3 = code3
+        self.code4 = code4
+        self.code5 = code5
+        self.code6 = code6
+
+    def get_if_delivery_day(self):
+        year = datetime.date.today().year
+        month = datetime.date.today().month
+        first_day = datetime.date(year=year, month=month, day=1)
+        print(first_day)
+
+    def get_result(self):
+        pass
+
+    @staticmethod
+    def get_sell1_buy1(code):
+        headers = {
+            'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36',
+        }
+        try:
+            sell1 = float(requests.get(
+                "http://hq.sinajs.cn/?format=json&list={0}".format(code),
+                headers=headers).text.split(",")[21])
+        except:
+            print("sell1获取失败")
+            return
+        return sell1
 
 
 class Context(object):
