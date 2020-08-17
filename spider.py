@@ -8,7 +8,7 @@ class Spider(object):
 
     def __init__(self):
         self.options = Options()
-        self.options.add_argument('--headless')
+        # self.options.add_argument('--headless')
         self.options.add_argument("--disable-gpu")
         self.options.add_argument("--hide-scrollbars")
         self.options.add_argument('blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
@@ -66,6 +66,19 @@ class YangQiETFSpider(Spider):
         return yesterday_value
 
 
+class HS300IndexSpider(Spider):
+    """获取沪深300指数"""
+
+    def __init__(self):
+        super(HS300IndexSpider,self).__init__()
+        self.driver.get("https://xueqiu.com/S/SH000300")
+
+    def get_result(self):
+        hs300_index = float(self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text)
+        return hs300_index
+
+
 class IFSpider(Spider):
     """IF当月连续爬虫"""
 
@@ -75,29 +88,58 @@ class IFSpider(Spider):
 
     def get_result(self):
         try:
-            if_index = self.driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/div[1]/p[1]/i[1]").text
+            if_index = float(self.driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/div[1]/p[1]/i[1]").text)
         except Exception as e:
             print("获取当月连续指数失败", e)
-            return "0"
+            return 0
         print("if_index", if_index)
         return if_index
 
 
-class HS300ETF(Spider):
+class HS300IOPV(Spider):
+    def __init__(self, code):
+        super(HS300IOPV, self).__init__()
+        self.code = code
+        self.driver.get("https://xueqiu.com/S/{}".format(self.code))
+
+    def get_result(self):
+        current_value = self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text
+        premium_rate = self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/table/tbody/tr[4]/td[2]/span').text
+
+        IOPV = current_value / (1 + premium_rate)
+        return IOPV
+
+
+class HS300ETF(object):
+    """获取沪深300ETF的卖1买1成交量"""
+
     def __init__(self, code1, code2, code3, code4, code5, code6):
-        super(HS300ETF, self).__init__()
         self.code1 = code1
         self.code2 = code2
         self.code3 = code3
         self.code4 = code4
         self.code5 = code5
         self.code6 = code6
+        self.spider1 = HS300IOPV(code1)
+        self.spider2 = HS300IOPV(code2)
+        self.spider3 = HS300IOPV(code3)
+        self.spider4 = HS300IOPV(code4)
+        self.spider5 = HS300IOPV(code5)
+        self.spider6 = HS300IOPV(code6)
+
+        self.headers = {
+            'UserAgent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36',
+        }
 
     def get_result(self):
-        requests.get(
+        info_1, info_2, info_3, info_4, info_5, info_6, _ = requests.get(
             "http://hq.sinajs.cn/?format=json&list={0},{1},{2},{3},{4},{5}".format(self.code1, self.code2, self.code3,
-                                                                                   self.code4, self.code5, self.code6))
+                                                                                   self.code4, self.code5, self.code6),
+            headers=self.headers).text.split(";")
+        print(info_1, info_2, info_3, info_4, info_5, info_6)
 
 
 if __name__ == '__main__':
-    YangQiETFSpider("sh515600").get_result()
+    HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360").get_result()

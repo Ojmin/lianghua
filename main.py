@@ -1,6 +1,6 @@
 import tkinter as tk
 import threading
-from strategy import Context,  YangQiETF
+from strategy import Context, YangQiETF, IF300ETF
 
 """
 Created by MinChengWen on 2020/8/12
@@ -73,6 +73,7 @@ class Window(tk.Tk):
         :return:
         """
         tip_list = []
+        # 转债
         # strategy1 = Context(
         #     ShareBondDifference(threshold=0.01, stock="sh603733", bond="sh113554", convertible_share_price=13.27,
         #                         strategy_name="share_bond_difference"))
@@ -93,8 +94,12 @@ class Window(tk.Tk):
         # tip_list.append(strategy3)
         # tip_list.append(strategy4)
         # tip_list.append(strategy5)
-        strategy6 = Context(YangQiETF("sh515600", "sh515680","sh515900","sz159974",0.004, 0.006))
-        tip_list.append(strategy6)
+        # 央企创新
+        # strategy6 = Context(YangQiETF("sh515600", "sh515680", "sh515900", "sz159974", 0.004, 0.006))
+        # tip_list.append(strategy6)
+        #IF连续
+        strategy7 = Context(IF300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360"))
+        tip_list.append(strategy7)
         return tip_list
 
     def run(self):

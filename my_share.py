@@ -35,8 +35,7 @@ def get_distance_of_delivery_day():
     d1 = datetime.date(year, 1, 1)
     d2 = get_if_delivery_day()
     interval = d2 - d1  # 两日期差距
-    print(interval.days)
-    return interval.days
+    return float(interval.days)
 
 
 def get_yesterday_amount(code):

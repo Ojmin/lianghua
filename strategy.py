@@ -4,8 +4,8 @@ import requests
 import tkinter as tk
 import tushare as ts
 
-from my_share import get_yesterday_amount
-from spider import YangQiETFSpider, YangQiIndexSpider
+from my_share import get_yesterday_amount, get_distance_of_delivery_day
+from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider
 
 """
 策略模式
@@ -248,6 +248,13 @@ class IF300ETF(Strategy):
         self.code4 = code4
         self.code5 = code5
         self.code6 = code6
+        self.spider1 = HS300IndexSpider()  # 沪深300的爬虫
+        self.spider2 = IFSpider()  # IF连续的指数
+        self.spider3 = HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360")  # 获取沪深300ETF的爬虫
+        self.var1 = tk.StringVar()  # 文本储存器
+        self.l1 = tk.Label(textvar=self.var1, font='Helvetica -30 bold', width=100,
+                           height=4)
+        self.l1.pack()  # 放置标签 self.var1 = tk.StringVar()  # 文本储存器
 
     def get_if_delivery_day(self):
         year = datetime.date.today().year
@@ -256,7 +263,28 @@ class IF300ETF(Strategy):
         print(first_day)
 
     def get_result(self):
-        pass
+        HS300index = self.spider1.get_result()
+        IFindex = self.spider2.get_result()
+        contango_rate = (HS300index - IFindex) / HS300index
+        have_days = get_distance_of_delivery_day()
+        contango_rate_of_year = contango_rate * 365 / have_days
+        print(contango_rate_of_year)
+        if contango_rate_of_year < 0.02:
+            self.l1["bg"] = "blue"
+            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            self.var1.set(msg)
+        if 0.02 <= contango_rate_of_year < 0.08:
+            self.l1["bg"] = "pink"
+            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            self.var1.set(msg)
+        elif 0.06 < contango_rate_of_year <= 0.08:
+            self.l1["bg"] = "yellow"
+            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            self.var1.set(msg)
+        elif contango_rate_of_year > 0.08:
+            self.l1["bg"] = "red"
+            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            self.var1.set(msg)
 
     @staticmethod
     def get_sell1_buy1(code):
