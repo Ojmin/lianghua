@@ -20,8 +20,8 @@ class Tip(object):
         self.convertible_share_price = convertible_share_price
 
         self.var = tk.StringVar()
-        self.l = tk.Label(textvar=self.var, font='Helvetica -30 bold', width=100,
-                          height=4)  # 参数textvar不同于text,bg是backgroud
+        self.l = tk.Label(textvar=self.var, font='Helvetica -30 bold', width=50,
+                          height=3)  # 参数textvar不同于text,bg是backgroud
         self.l.pack()  # 放置标签
         # self.bg = "yellow"
 
@@ -33,7 +33,7 @@ class Window(tk.Tk):
         super().__init__()
         self.wm_title('提醒')
         self.configure(background='white')
-        self.wm_minsize(1440, 770)  # 设置窗口最小化大小
+        self.wm_minsize(360, 260)  # 设置窗口最小化大小
         self.wm_maxsize(2880, 1600)  # 设置窗口最大化大小
         self.resizable(width=True, height=True)  # 设置窗口宽度不可变，高度可变
 

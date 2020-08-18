@@ -78,4 +78,5 @@ class Calculation(object):
 
 
 if __name__ == '__main__':
-    print(get_distance_of_delivery_day())
+    r=requests.get("http://q.stock.sohu.com/hisHq?code=cn_{0}&start={1}&end={2}".format("513030","20200817","20200817"))
+    print(r.text)

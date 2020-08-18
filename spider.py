@@ -10,12 +10,12 @@ class Spider(object):
 
     def __init__(self):
         self.options = Options()
-        # self.options.add_argument('--headless')
+        self.options.add_argument('--headless')
         self.options.add_argument("--disable-gpu")
         self.options.add_argument("--hide-scrollbars")
         self.options.add_argument('blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
         self.driver = webdriver.Chrome(options=self.options,
-                                       executable_path='C:/Users/Administrator/PycharmProjects/pythonProject/chromedriver.exe')
+                                       executable_path='./chromedriver.exe')
         self.driver.implicitly_wait(5)
 
     def close(self):

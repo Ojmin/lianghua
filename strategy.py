@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import requests
 import tkinter as tk
@@ -260,11 +261,11 @@ class IF300ETF(Strategy):
         self.spider9 = HS300IOPV(code6)
         self.var1 = tk.StringVar()  # 文本储存器
         self.var2 = tk.StringVar()  # 文本储存器
-        self.l1 = tk.Label(textvar=self.var1, font='Helvetica -30 bold', width=100,
-                           height=4)
+        self.l1 = tk.Label(textvar=self.var1, font='Helvetica -30 bold', width=80,
+                           height=3)
         self.l1.pack()  # 放置标签 self.var1 = tk.StringVar()  # 文本储存器
-        self.l2 = tk.Label(textvar=self.var2, font='Helvetica -30 bold', width=100,
-                           height=4)
+        self.l2 = tk.Label(textvar=self.var2, font='Helvetica -30 bold', width=80,
+                           height=3)
         self.l2.pack()
 
     def get_if_delivery_day(self):
@@ -285,7 +286,7 @@ class IF300ETF(Strategy):
         print("年化贴水率", contango_rate_of_year)
         if contango_rate_of_year < 0.02:
             self.l1["bg"] = "blue"
-            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            msg = "当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
             self.var1.set(msg)
             IOPV_1 = self.spider4.get_result()
             IOPV_2 = self.spider5.get_result()
@@ -309,10 +310,14 @@ class IF300ETF(Strategy):
             result = sorted(result, key=lambda x: x["rate"])
             # 获取溢价率最小值
             min_rate = result[0]["rate"]
+            new_result = []
             for i in result:
-                if i["rate"] > min_rate + 0.001:
-                    result.remove(i)
-            max_volume_etf = max(result, key=lambda x: x["volume"])
+                if i["rate"] < min_rate + 0.001:
+                    new_result.append(i)
+            max_volume_etf = max(new_result, key=lambda x: x["volume"])
+            # comment = re.compile(r's(.*?),', re.S)
+            # comment1 = comment.findall(max_volume_etf["code"])
+
             code = max_volume_etf["code"][13:21]
             msg = "sell1/IOPV-1的最小值为{},在+0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (min_rate * 100), code,
                                                                              max_volume_etf["volume"])
@@ -321,16 +326,17 @@ class IF300ETF(Strategy):
 
         if 0.02 <= contango_rate_of_year < 0.08:
             self.l1["bg"] = "white"
-            # msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
-            msg = ""
+            msg = "当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
             self.var1.set(msg)
+            self.l2["bg"] = "white"
+            self.var2.set("")
         elif 0.06 < contango_rate_of_year <= 0.08:
             self.l1["bg"] = "yellow"
-            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            msg = "当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
             self.var1.set(msg)
         elif contango_rate_of_year > 0.08:
             self.l1["bg"] = "red"
-            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            msg = "当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
             self.var1.set(msg)
             IOPV_1 = self.spider4.get_result()
             IOPV_2 = self.spider5.get_result()
@@ -354,12 +360,15 @@ class IF300ETF(Strategy):
             result = sorted(result, key=lambda x: x["rate"])
             # 获取溢价率最小值
             max_rate = result[5]["rate"]
+            new_result = []
             for i in result:
-                if i["rate"] < max_rate - 0.001:
-                    result.remove(i)
-            max_volume_etf = max(result, key=lambda x: x["volume"])
+                if i["rate"] > max_rate - 0.001:
+                    new_result.append(i)
+            print(new_result)
+            max_volume_etf = max(new_result, key=lambda x: x["volume"])
             code = max_volume_etf["code"][13:21]
-            msg = "sell1/IOPV-1的最大值为{},在-0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (max_rate * 100), code,
+            msg = "sell1/IOPV-1的最大值为{},在-0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (max_rate * 100),
+                                                                             code.replace("h", "").replace("=", ""),
                                                                              max_volume_etf["volume"])
             self.l2["bg"] = "orange"
             self.var2.set(msg)
@@ -377,6 +386,14 @@ class IF300ETF(Strategy):
             print("sell1获取失败")
             return
         return sell1
+
+
+class Germany30Strategy(Strategy):
+    def __init__(self):
+        super(Germany30Strategy, self).__init__()
+
+    def get_result(self):
+        pass
 
 
 class Context(object):
