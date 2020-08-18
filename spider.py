@@ -1,3 +1,5 @@
+import time
+
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -103,12 +105,20 @@ class HS300IOPV(Spider):
         self.driver.get("https://xueqiu.com/S/{}".format(self.code))
 
     def get_result(self):
-        current_value = self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text
-        premium_rate = self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div[2]/div[2]/div[5]/table/tbody/tr[4]/td[2]/span').text
-
-        IOPV = current_value / (1 + premium_rate)
+        try:
+            current_value = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥","")
+            premium_rate = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/table/tbody/tr[4]/td[2]/span').text
+        except :
+            print("获取300ETF错误",self.code)
+            time.sleep(1)
+            current_value = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", "")
+            premium_rate = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/table/tbody/tr[4]/td[2]/span').text
+        premium_rate = float(premium_rate.strip('%')) / 100
+        IOPV = float(current_value) / (1 + premium_rate)
         return IOPV
 
 
@@ -132,8 +142,12 @@ class HS300ETF(object):
             "http://hq.sinajs.cn/?format=json&list={0},{1},{2},{3},{4},{5}".format(self.code1, self.code2, self.code3,
                                                                                    self.code4, self.code5, self.code6),
             headers=self.headers).text.split(";")
-        print(info_1, info_2, info_3, info_4, info_5, info_6)
-
+        info_list = []
+        for i in (info_1, info_2, info_3, info_4, info_5, info_6):
+            info = i.split(",")
+            info_list.append(
+                {"name": info[0], "current_price": info[3], "buy1": info[6], "sell1": info[7], "volume": info[8]})
+        return info_list
 
 if __name__ == '__main__':
     HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360").get_result()

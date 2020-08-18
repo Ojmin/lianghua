@@ -250,7 +250,7 @@ class IF300ETF(Strategy):
         self.code6 = code6
         self.spider1 = HS300IndexSpider()  # 沪深300的爬虫
         self.spider2 = IFSpider()  # IF连续的指数
-        self.spider3 = HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360")  # 获取沪深300ETF的爬虫
+        self.spider3 = HS300ETF(code1, code2, code3, code4, code5, code6)  # 获取沪深300ETF的爬虫
 
         self.spider4 = HS300IOPV(code1)
         self.spider5 = HS300IOPV(code2)
@@ -259,9 +259,13 @@ class IF300ETF(Strategy):
         self.spider8 = HS300IOPV(code5)
         self.spider9 = HS300IOPV(code6)
         self.var1 = tk.StringVar()  # 文本储存器
+        self.var2 = tk.StringVar()  # 文本储存器
         self.l1 = tk.Label(textvar=self.var1, font='Helvetica -30 bold', width=100,
                            height=4)
         self.l1.pack()  # 放置标签 self.var1 = tk.StringVar()  # 文本储存器
+        self.l2 = tk.Label(textvar=self.var2, font='Helvetica -30 bold', width=100,
+                           height=4)
+        self.l2.pack()
 
     def get_if_delivery_day(self):
         year = datetime.date.today().year
@@ -275,11 +279,41 @@ class IF300ETF(Strategy):
         contango_rate = (HS300index - IFindex) / HS300index
         have_days = get_distance_of_delivery_day()
         contango_rate_of_year = contango_rate * 365 / have_days
-        print(contango_rate_of_year)
         if contango_rate_of_year < 0.02:
             self.l1["bg"] = "blue"
             msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
             self.var1.set(msg)
+            IOPV_1 = self.spider4.get_result()
+            IOPV_2 = self.spider5.get_result()
+            IOPV_3 = self.spider6.get_result()
+            IOPV_4 = self.spider7.get_result()
+            IOPV_5 = self.spider8.get_result()
+            IOPV_6 = self.spider9.get_result()
+            # 买1卖1成交量
+            info_list = self.spider3.get_result()
+            info_list[0]["IOPV"] = IOPV_1
+            info_list[1]["IOPV"] = IOPV_2
+            info_list[2]["IOPV"] = IOPV_3
+            info_list[3]["IOPV"] = IOPV_4
+            info_list[4]["IOPV"] = IOPV_5
+            info_list[5]["IOPV"] = IOPV_6
+            result = []
+            for i in info_list:
+                result.append(
+                    {"rate": float(i["sell1"]) / float(i["IOPV"]) - 1, "volume": i["volume"], "code": i["name"]})
+            # 排序
+            result = sorted(result, key=lambda x: x["rate"])
+            # 获取溢价率最小值
+            min_rate = result[0]["rate"]
+            for i in result:
+                if i["rate"] > min_rate + 0.001:
+                    result.remove(i)
+            max_volume_etf = max(result, key=lambda x: x["volume"])
+            code = max_volume_etf["code"][13:19]
+            msg = "sell1/IOPV-1的最小值为{},在+0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (min_rate * 100), code, max_volume_etf["volume"])
+            self.l2["bg"] = "green"
+            self.var2.set(msg)
+
         if 0.02 <= contango_rate_of_year < 0.08:
             self.l1["bg"] = "pink"
             msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
@@ -292,6 +326,36 @@ class IF300ETF(Strategy):
             self.l1["bg"] = "red"
             msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
             self.var1.set(msg)
+            IOPV_1 = self.spider4.get_result()
+            IOPV_2 = self.spider5.get_result()
+            IOPV_3 = self.spider6.get_result()
+            IOPV_4 = self.spider7.get_result()
+            IOPV_5 = self.spider8.get_result()
+            IOPV_6 = self.spider9.get_result()
+            # 买1卖1成交量
+            info_list = self.spider3.get_result()
+            info_list[0]["IOPV"] = IOPV_1
+            info_list[1]["IOPV"] = IOPV_2
+            info_list[2]["IOPV"] = IOPV_3
+            info_list[3]["IOPV"] = IOPV_4
+            info_list[4]["IOPV"] = IOPV_5
+            info_list[5]["IOPV"] = IOPV_6
+            result = []
+            for i in info_list:
+                result.append(
+                    {"rate": float(i["sell1"]) / float(i["IOPV"]) - 1, "volume": i["volume"], "code": i["name"]})
+            # 排序
+            result = sorted(result, key=lambda x: x["rate"])
+            # 获取溢价率最小值
+            max_rate = result[5]["rate"]
+            for i in result:
+                if i["rate"] < max_rate - 0.001:
+                    result.remove(i)
+            max_volume_etf = max(result, key=lambda x: x["volume"])
+            code = max_volume_etf["code"][13:21]
+            msg = "sell1/IOPV-1的最大值为{},在-0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (max_rate * 100), code, max_volume_etf["volume"])
+            self.l2["bg"] = "orange"
+            self.var2.set(msg)
 
     @staticmethod
     def get_sell1_buy1(code):
