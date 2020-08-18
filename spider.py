@@ -76,8 +76,14 @@ class HS300IndexSpider(Spider):
         self.driver.get("https://xueqiu.com/S/SH000300")
 
     def get_result(self):
-        hs300_index = float(self.driver.find_element_by_xpath(
+        try:
+            hs300_index = float(self.driver.find_element_by_xpath(
             '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text)
+        except:
+            time.sleep(1)
+            hs300_index = float(self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text)
+            print("抓取错误")
         return hs300_index
 
 

@@ -275,10 +275,14 @@ class IF300ETF(Strategy):
 
     def get_result(self):
         HS300index = self.spider1.get_result()
+        print("300指数", HS300index)
         IFindex = self.spider2.get_result()
+        print("IF指数", IFindex)
         contango_rate = (HS300index - IFindex) / HS300index
         have_days = get_distance_of_delivery_day()
+        print(have_days)
         contango_rate_of_year = contango_rate * 365 / have_days
+        print("年化贴水率", contango_rate_of_year)
         if contango_rate_of_year < 0.02:
             self.l1["bg"] = "blue"
             msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
@@ -309,14 +313,16 @@ class IF300ETF(Strategy):
                 if i["rate"] > min_rate + 0.001:
                     result.remove(i)
             max_volume_etf = max(result, key=lambda x: x["volume"])
-            code = max_volume_etf["code"][13:19]
-            msg = "sell1/IOPV-1的最小值为{},在+0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (min_rate * 100), code, max_volume_etf["volume"])
+            code = max_volume_etf["code"][13:21]
+            msg = "sell1/IOPV-1的最小值为{},在+0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (min_rate * 100), code,
+                                                                             max_volume_etf["volume"])
             self.l2["bg"] = "green"
             self.var2.set(msg)
 
         if 0.02 <= contango_rate_of_year < 0.08:
-            self.l1["bg"] = "pink"
-            msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            self.l1["bg"] = "white"
+            # msg = "沪深300当月年化贴水率{}".format('%.3f%%' % (contango_rate_of_year * 100))
+            msg = ""
             self.var1.set(msg)
         elif 0.06 < contango_rate_of_year <= 0.08:
             self.l1["bg"] = "yellow"
@@ -353,7 +359,8 @@ class IF300ETF(Strategy):
                     result.remove(i)
             max_volume_etf = max(result, key=lambda x: x["volume"])
             code = max_volume_etf["code"][13:21]
-            msg = "sell1/IOPV-1的最大值为{},在-0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (max_rate * 100), code, max_volume_etf["volume"])
+            msg = "sell1/IOPV-1的最大值为{},在-0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (max_rate * 100), code,
+                                                                             max_volume_etf["volume"])
             self.l2["bg"] = "orange"
             self.var2.set(msg)
 

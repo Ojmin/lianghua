@@ -4,14 +4,15 @@ import time
 
 import requests
 
+year = datetime.date.today().year
+month = datetime.date.today().month
 
-def get_if_delivery_day():
+
+def get_if_delivery_day(year, month):
     """
     获取if连续合约交割日
     :return:
     """
-    year = datetime.date.today().year
-    month = datetime.date.today().month
     first_day = datetime.date(year=year, month=month, day=1)
     num = 0
     days = 0
@@ -21,19 +22,26 @@ def get_if_delivery_day():
         if weekday == 4:
             num += 1
         if num == 3:
-            break
+            if date < datetime.date.today():
+                month += 1
+                if month > 12:
+                    month = 1
+                    year += 1
+                return get_if_delivery_day(year, month)
+            else:
+                return date
         days += 1
-    return date
+
+    # 如果本月已交割，求下一个月的交割日
 
 
 def get_distance_of_delivery_day():
     """
-    获取交割日距离当年1月1号的天数
+    获取距离交割日天数
     :return:
     """
-    year = datetime.date.today().year
-    d1 = datetime.date(year, 1, 1)
-    d2 = get_if_delivery_day()
+    d1 = datetime.date.today()
+    d2 = get_if_delivery_day(year, month)
     interval = d2 - d1  # 两日期差距
     return float(interval.days)
 
@@ -70,4 +78,4 @@ class Calculation(object):
 
 
 if __name__ == '__main__':
-    get_yesterday_amount()
+    print(get_distance_of_delivery_day())
