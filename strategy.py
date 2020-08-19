@@ -3,10 +3,10 @@ import re
 
 import requests
 import tkinter as tk
-import tushare as ts
 
 from my_share import get_yesterday_amount, get_distance_of_delivery_day
-from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV
+from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV, \
+    Germany30SPIFSpider, Germany30ETFSpider
 
 """
 策略模式
@@ -33,8 +33,8 @@ class Strategy(object):
 class ShareBondDifference(Strategy):
     """
     可转债转股和股票的价差
-        :param p1: 股票价格(指数）
-        :param p2: 可转债价格(对标指数）
+        :param p1: 股票价格(指数)
+        :param p2: 可转债价格(对标指数)
         :param convertible_share_price: 转股价格
         :param buy1: 买一价
         :param sell1: 卖一价
@@ -228,7 +228,7 @@ class YangQiETF(Strategy):
 class IF300ETF(Strategy):
     """
     抓取IF当月连续合约实时价格，当月合约到期时间，000300沪深300指数实时价格。
-当月贴水率=（沪深300指数实时价格-IF当月合约实时价格）/沪深300指数实时价格
+当月贴水率=(沪深300指数实时价格-IF当月合约实时价格)/沪深300指数实时价格
 当月年化贴水率=当月贴水率*365/当月合约到期时间
 当月年化贴水率大于8%时，显示红色
 当月年化贴水率介于6%至8%时，显示黄色
@@ -236,8 +236,8 @@ class IF300ETF(Strategy):
 
 
 抓取ETF基金510300，510310，510380，159919，515660，515360实时买一盘口价，卖一盘口价，实时IOPV，成交量。
-当IF显示蓝色时，抓取的这些基金的（卖一盘口价/IOPV-1）里面最小值+0.1%的所有数据，成交量最大的基金显示青色。
-当IF显示红色时，抓取的这些基金的（买一盘口价/IOPV-1）里面最大值-0.1%的所有数据，成交量最大的基金显示橙色。
+当IF显示蓝色时，抓取的这些基金的(卖一盘口价/IOPV-1)里面最小值+0.1%的所有数据，成交量最大的基金显示青色。
+当IF显示红色时，抓取的这些基金的(买一盘口价/IOPV-1)里面最大值-0.1%的所有数据，成交量最大的基金显示橙色。
     """
 
     def __init__(self, code1, code2, code3, code4, code5, code6):
@@ -265,7 +265,7 @@ class IF300ETF(Strategy):
                            height=3)
         self.l1.pack()  # 放置标签 self.var1 = tk.StringVar()  # 文本储存器
         self.l2 = tk.Label(textvar=self.var2, font='Helvetica -30 bold', width=80,
-                           height=3)
+                           height=10)
         self.l2.pack()
 
     def get_if_delivery_day(self):
@@ -305,7 +305,8 @@ class IF300ETF(Strategy):
             result = []
             for i in info_list:
                 result.append(
-                    {"rate": float(i["sell1"]) / float(i["IOPV"]) - 1, "volume": i["volume"], "code": i["name"]})
+                    {"rate": float(i["buy1"]) / float(i["IOPV"]) - 1, "buy1": i["buy1"], "sell1": i["sell1"],
+                     "buy1_num": i["buy1_num"], "sell1_num": i["sell1_num"], "volume": i["volume"], "code": i["name"]})
             # 排序
             result = sorted(result, key=lambda x: x["rate"])
             # 获取溢价率最小值
@@ -314,13 +315,16 @@ class IF300ETF(Strategy):
             for i in result:
                 if i["rate"] < min_rate + 0.001:
                     new_result.append(i)
-            max_volume_etf = max(new_result, key=lambda x: x["volume"])
+            # max_volume_etf = max(new_result, key=lambda x: x["volume"])
             # comment = re.compile(r's(.*?),', re.S)
             # comment1 = comment.findall(max_volume_etf["code"])
-
-            code = max_volume_etf["code"][13:21]
-            msg = "sell1/IOPV-1的最小值为{},在+0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (min_rate * 100), code,
-                                                                             max_volume_etf["volume"])
+            msg = ""
+            for i in new_result:
+                code = i["code"][13:21]
+                msg1 = "基金为{},sell1/IOPV-1的值为{},成交量为{}万,买1盘口数量为{}\n\n".format(
+                    code.replace("h", "").replace("=", ""),
+                    '%.3f%%' % (i["rate"] * 100), float(i["volume"])/10000, i["buy1_num"])
+                msg += msg1
             self.l2["bg"] = "green"
             self.var2.set(msg)
 
@@ -355,7 +359,8 @@ class IF300ETF(Strategy):
             result = []
             for i in info_list:
                 result.append(
-                    {"rate": float(i["sell1"]) / float(i["IOPV"]) - 1, "volume": i["volume"], "code": i["name"]})
+                    {"rate": float(i["buy1"]) / float(i["IOPV"]) - 1, "buy1": i["buy1"], "sell1": i["sell1"],
+                     "buy1_num": i["buy1_num"], "sell1_num": i["sell1_num"], "volume": i["volume"], "code": i["name"]})
             # 排序
             result = sorted(result, key=lambda x: x["rate"])
             # 获取溢价率最小值
@@ -364,12 +369,15 @@ class IF300ETF(Strategy):
             for i in result:
                 if i["rate"] > max_rate - 0.001:
                     new_result.append(i)
-            print(new_result)
-            max_volume_etf = max(new_result, key=lambda x: x["volume"])
-            code = max_volume_etf["code"][13:21]
-            msg = "sell1/IOPV-1的最大值为{},在-0.1%的范围内,成交量最大的基金为{},成交量为{}".format('%.3f%%' % (max_rate * 100),
-                                                                             code.replace("h", "").replace("=", ""),
-                                                                             max_volume_etf["volume"])
+            msg = ""
+            for i in new_result:
+                # print(new_result)
+                # max_volume_etf = max(new_result, key=lambda x: x["volume"])
+                code = i["code"][13:21]
+                msg1 = "基金为{},buy1/IOPV-1的值为{},成交量为{}万,卖1盘口数量为{}\n\n".format(
+                    code.replace("h", "").replace("=", ""),
+                    '%.3f%%' % (i["rate"] * 100), float(i["volume"])/10000, i["sell1_num"])
+                msg += msg1
             self.l2["bg"] = "orange"
             self.var2.set(msg)
 
@@ -389,10 +397,89 @@ class IF300ETF(Strategy):
 
 
 class Germany30Strategy(Strategy):
+    """德国30交易策略"""
+
     def __init__(self):
         super(Germany30Strategy, self).__init__()
+        self.spider1 = Germany30SPIFSpider()
+        self.spider2 = Germany30ETFSpider()
+        # T-2日513030净值
+        # T-1日德国30指数涨跌幅
+        # T-1日德国30指数收盘值
+        # T-1日欧元人民币中间价汇率
+        # T日欧元人民币中间价汇率
+        self.l1 = tk.Label(text="T-2日513030净值: ", bg="white").grid(row=0, column=0, padx=10, pady=5)
+        self.entry1 = tk.Entry(width=20)
+        self.entry1.grid(row=0, column=1, padx=10, pady=5)
+        self.l2 = tk.Label(text="T-1德国30指数涨跌幅：", bg="white").grid(row=1, column=0, padx=10, pady=5)
+        self.entry2 = tk.Entry(width=20)
+        self.entry2.grid(row=1, column=1, padx=10, pady=5)
+        self.l3 = tk.Label(text="T-1日德国30指数收盘值：", bg="white").grid(row=2, column=0, padx=10, pady=5)
+        self.entry3 = tk.Entry(width=20)
+        self.entry3.grid(row=2, column=1, padx=10, pady=5)
+        self.l4 = tk.Label(text="T-1日欧元人民币中间价：", bg="white").grid(row=3, column=0, padx=10, pady=5)
+        self.entry4 = tk.Entry(width=20)
+        self.entry4.grid(row=3, column=1, padx=10, pady=5)
+        self.l5 = tk.Label(text="T日欧元人民币中间价：", bg="white").grid(row=4, column=0, padx=10, pady=5)
+        self.entry5 = tk.Entry(width=20)
+        self.entry5.grid(row=4, column=1, padx=10, pady=5)
+        tk.Button(text="启动", width=10, bg="grey", command=self.flag_).grid(row=6, column=0,
+                                                                           padx=10, pady=5)
+        tk.Button(text="停止", width=10, bg="grey", command=self.flag__).grid(row=6, column=1,
+                                                                            padx=10, pady=5)
+        # show Lable
+        self.var = tk.StringVar()  # 文本储存器
+        self.l6 = tk.Label(textvar=self.var, font='Helvetica -30 bold', width=30, height=3)
+        self.l6.grid( row=5,columnspan=2,padx=10, pady=5)
+        self.my_flag = False
 
     def get_result(self):
+        if not self.my_flag:
+            return
+        # T日德国30股指期货实时点数
+        p5 = float(self.spider1.get_result())
+        # T日513030实时价格
+        p6 = float(self.spider2.get_result())
+        p1 = float(self.entry1.get())
+        p2 = float(self.entry2.get())
+        p20 = float(self.entry3.get())
+        p3 = float(self.entry4.get())
+        p4 = float(self.entry5.get())
+
+        p7 = p1 * (1 + p2 * 0.95) * (1 + p3)
+        p8 = p7 * (1 + (p5 / p20 - 1) * 0.95) * (1 + p4)
+
+        # 条件：
+        # 1）当P6 / P8 - 1 < -0.01
+        # 时，买入513030，卖出德国30指数期货
+        # 2）当P6 / P8 - 1 > 0.01
+        # 时，申购513030
+        result= p6 / p8 - 1
+        print(result)
+        if result < -0.01:
+            self.var.set("买入513030，卖出德国30指数期货\nr={}".format(result))
+            self.l6["bg"]="red"
+            return
+        if -0.01<result<0.01:
+            self.var.set("无操作")
+            self.l6["bg"]="white"
+            return
+        if result > 0.01:
+            self.l6["bg"]="red"
+            self.var.set("申购513030\nr={}".format(result))
+            return
+
+    def flag_(self):
+        # T-1日513030估值
+        self.my_flag = True
+        return
+
+    def flag__(self):
+        self.my_flag = False
+        return
+
+    def valuation_t(self):
+        # T日513030估值
         pass
 
 

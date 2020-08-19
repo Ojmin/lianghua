@@ -78,7 +78,7 @@ class HS300IndexSpider(Spider):
     def get_result(self):
         try:
             hs300_index = float(self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text)
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text)
         except:
             time.sleep(1)
             hs300_index = float(self.driver.find_element_by_xpath(
@@ -113,11 +113,11 @@ class HS300IOPV(Spider):
     def get_result(self):
         try:
             current_value = self.driver.find_element_by_xpath(
-                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥","")
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", "")
             premium_rate = self.driver.find_element_by_xpath(
                 '//*[@id="app"]/div[2]/div[2]/div[5]/table/tbody/tr[4]/td[2]/span').text
-        except :
-            print("获取300ETF错误",self.code)
+        except:
+            print("获取300ETF错误", self.code)
             time.sleep(1)
             current_value = self.driver.find_element_by_xpath(
                 '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", "")
@@ -152,8 +152,30 @@ class HS300ETF(object):
         for i in (info_1, info_2, info_3, info_4, info_5, info_6):
             info = i.split(",")
             info_list.append(
-                {"name": info[0], "current_price": info[3], "buy1": info[6], "sell1": info[7], "volume": info[8]})
+                {"name": info[0], "current_price": info[3], "buy1": info[11],"buy1_num":info[10], "sell1": info[21],"sell1_num":info[20], "volume": info[8]})
         return info_list
 
+
+class Germany30SPIFSpider(Spider):
+    def __init__(self):
+        super(Germany30SPIFSpider, self).__init__()
+        self.driver.get("https://cn.investing.com/indices/germany-30-futures")
+
+    def get_result(self):
+        germany30_spif = float(self.driver.find_element_by_xpath('//*[@id="last_last"]').text.replace(",", ""))
+        return germany30_spif
+
+
+class Germany30ETFSpider(Spider):
+    def __init__(self):
+        super().__init__()
+        self.driver.get("https://xueqiu.com/S/SH513030")
+
+    def get_result(self):
+        germany30_etf = float(self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", ""))
+        return germany30_etf
+
+
 if __name__ == '__main__':
-    HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360").get_result()
+    print(HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360").get_result())
