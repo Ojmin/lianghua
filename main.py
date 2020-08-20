@@ -1,6 +1,6 @@
 import tkinter as tk
 import threading
-from strategy import Context, YangQiETF, IF300ETF, Germany30Strategy
+from strategy import Context, YangQiETF, IF300ETF, Germany30Strategy, SoftMonitoring
 
 """
 Created by MinChengWen on 2020/8/12
@@ -98,10 +98,12 @@ class Window(tk.Tk):
         # strategy6 = Context(YangQiETF("sh515600", "sh515680", "sh515900", "sz159974", 0.004, 0.006))
         # tip_list.append(strategy6)
         # IF连续
-        strategy7 = Context(IF300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360"))
+        # strategy7 = Context(IF300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360"))
         # 德国30
         # strategy8 = Context(Germany30Strategy())
-        tip_list.append(strategy7)
+        #监控
+        strategy9=Context(SoftMonitoring())
+        tip_list.append(strategy9)
         return tip_list
 
     def run(self):

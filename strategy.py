@@ -3,7 +3,7 @@ import re
 
 import requests
 import tkinter as tk
-
+from tkinter import ttk
 from my_share import get_yesterday_amount, get_distance_of_delivery_day
 from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV, \
     Germany30SPIFSpider, Germany30ETFSpider
@@ -323,7 +323,7 @@ class IF300ETF(Strategy):
                 code = i["code"][13:21]
                 msg1 = "基金为{},sell1/IOPV-1的值为{},成交量为{}万,买1盘口数量为{}\n\n".format(
                     code.replace("h", "").replace("=", ""),
-                    '%.3f%%' % (i["rate"] * 100), float(i["volume"])/10000, i["buy1_num"])
+                    '%.3f%%' % (i["rate"] * 100), float(i["volume"]) / 10000, i["buy1_num"])
                 msg += msg1
             self.l2["bg"] = "green"
             self.var2.set(msg)
@@ -376,7 +376,7 @@ class IF300ETF(Strategy):
                 code = i["code"][13:21]
                 msg1 = "基金为{},buy1/IOPV-1的值为{},成交量为{}万,卖1盘口数量为{}\n\n".format(
                     code.replace("h", "").replace("=", ""),
-                    '%.3f%%' % (i["rate"] * 100), float(i["volume"])/10000, i["sell1_num"])
+                    '%.3f%%' % (i["rate"] * 100), float(i["volume"]) / 10000, i["sell1_num"])
                 msg += msg1
             self.l2["bg"] = "orange"
             self.var2.set(msg)
@@ -430,7 +430,7 @@ class Germany30Strategy(Strategy):
         # show Lable
         self.var = tk.StringVar()  # 文本储存器
         self.l6 = tk.Label(textvar=self.var, font='Helvetica -30 bold', width=30, height=3)
-        self.l6.grid( row=5,columnspan=2,padx=10, pady=5)
+        self.l6.grid(row=5, columnspan=2, padx=10, pady=5)
         self.my_flag = False
 
     def get_result(self):
@@ -454,18 +454,18 @@ class Germany30Strategy(Strategy):
         # 时，买入513030，卖出德国30指数期货
         # 2）当P6 / P8 - 1 > 0.01
         # 时，申购513030
-        result= p6 / p8 - 1
+        result = p6 / p8 - 1
         print(result)
         if result < -0.01:
             self.var.set("买入513030，卖出德国30指数期货\nr={}".format(result))
-            self.l6["bg"]="red"
+            self.l6["bg"] = "red"
             return
-        if -0.01<result<0.01:
+        if -0.01 < result < 0.01:
             self.var.set("无操作")
-            self.l6["bg"]="white"
+            self.l6["bg"] = "white"
             return
         if result > 0.01:
-            self.l6["bg"]="red"
+            self.l6["bg"] = "red"
             self.var.set("申购513030\nr={}".format(result))
             return
 
@@ -481,6 +481,89 @@ class Germany30Strategy(Strategy):
     def valuation_t(self):
         # T日513030估值
         pass
+
+
+class SoftMonitoring(Strategy):
+
+    def __init__(self):
+        super().__init__()
+        # tk.Label(text="涨跌幅%", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=1)
+        # tk.Label(text="价格", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=2)
+        # tk.Label(text="T-1日净值", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=3)
+        # tk.Label(text="相对T-1日溢价", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=4)
+        # tk.Label(text="HKDCNYC", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=5)
+        # tk.Label(text="港股贡献", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=6)
+        # tk.Label(text="港股仓位", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=7)
+        # tk.Label(text="T日溢价估算", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=8)
+        # tk.Label(text="USDCNYC", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=9)
+        # tk.Label(text="T日ADR贡献参考", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=10)
+        # tk.Label(text="ADR仓位", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=11)
+        # tk.Label(text="总仓位", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=12)
+        # tk.Label(text="加ADR后溢价", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=13)
+        # tk.Label(text="164906\n腾讯涨跌差", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=14)
+        # tk.Label(text="513050\n腾讯涨跌差", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=15)
+        # tk.Label(text="164906-513050\n涨跌差", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=16)
+        # tk.Label(text="T-1日净值计算涨跌幅", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=17)
+        # tk.Label(text="H11137+汇率涨跌幅", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=18)
+        # tk.Label(text="H30533涨跌幅", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=19)
+        #
+        # tk.Label(text="164906", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=1, column=0)
+        # tk.Label(text="513050", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=2, column=0)
+        # tk.Label(text="00700", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=3, column=0)
+        # self.var1 = tk.StringVar()
+        # self.l1 = tk.Label(textvar=self.var1, bg="white",font='Helvetica -12 bold',relief="ridge")
+        # self.l1.grid(row=1, column=1)
+        self.tree_data = ttk.Treeview()
+        # "T日溢价估算","164906-513050涨跌差","ADR_t",标签化
+        self.tree_data["columns"] = ["change", "price", "value_t_1", "premium_t_1", "HKDCNYC", "HKcontribution",
+                                     "HK_position", "USDCNYC", "ADR_position", "total_position", "premium_with_ADR",
+                                     "164906-tencent_change",
+                                     "513050-tencent_change", "164906-513050_change", "t_1_value_for_change",
+                                     "H11137+exchange_rate", "H30533exchange"
+                                     ]
+        self.tree_data.column("change", width=60)
+        self.tree_data.column("price", width=60)
+        self.tree_data.column("value_t_1", width=60)
+        self.tree_data.column("premium_t_1", width=60)
+        self.tree_data.column("HKDCNYC", width=60)
+        self.tree_data.column("HKcontribution", width=60)
+        self.tree_data.column("HK_position", width=60)
+        # self.tree_data.column("premium_t",width=60)
+        self.tree_data.column("USDCNYC", width=60)
+        self.tree_data.column("ADR_position", width=60)
+        self.tree_data.column("total_position", width=60)
+        self.tree_data.column("premium_with_ADR", width=60)
+        self.tree_data.column("164906-tencent_change", width=60)
+        self.tree_data.column("513050-tencent_change", width=60)
+
+        self.tree_data.heading("change", text="涨跌幅%")
+        self.tree_data.heading("price", text="价格")
+        self.tree_data.heading("value_t_1", text="T-1日净值")
+        self.tree_data.heading("premium_t_1", text="相对T-1日溢价")
+        self.tree_data.heading("HKDCNYC", text="HKDCNYC")
+        self.tree_data.heading("HKcontribution", text="港股贡献")
+        self.tree_data.heading("HK_position", text="港股仓位")
+        self.tree_data.heading("USDCNYC", text="USDCNYC")
+        self.tree_data.heading("ADR_position", text="ADR仓位")
+        self.tree_data.heading("total_position", text="总仓位")
+        self.tree_data.heading("premium_with_ADR", text="加ADR后溢价")
+        self.tree_data.heading("164906-tencent_change", text="164906-腾讯涨跌差")
+        self.tree_data.heading("513050-tencent_change", text="513050-腾讯涨跌差")
+        self.tree_data.heading("164906-513050_change", text="164906-513050涨跌差")
+        self.tree_data.heading("t_1_value_for_change", text="T-1日净值计算涨跌幅")
+        self.tree_data.heading("H11137+exchange_rate", text="H11137+汇率涨跌幅")
+        self.tree_data.heading("H30533exchange", text="H30533涨跌幅")
+        self.tree_data.grid(row=0,columnspan=2,padx=10,pady=5)
+        self.l1 = tk.Label(text="汇率涨跌-港币中间价HKDCNYC: ", bg="white").grid(row=0, column=0, padx=10, pady=5,stick=tk.E)
+        self.entry1 = tk.Entry(width=20)
+        self.entry1.grid(row=0, column=1, padx=10, pady=5,stick=tk.W)
+    def get_result(self):
+        # 清空原列表
+        x = self.tree_data.get_children()
+        for item in x:
+            self.tree_data.delete(item)
+        self.tree_data.insert('', 1, text='164906', values=(
+        '0%', 54, 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
 
 
 class Context(object):
