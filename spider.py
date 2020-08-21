@@ -227,7 +227,18 @@ class CNNETETF(Spider):
         return (price, change)
 
 
+class JISILUConvertibleBond(Spider):
+    def __init__(self):
+        super().__init__()
+        self.driver.get("https://www.jisilu.cn/data/cbnew/#cb")
+    def get_result(self):
+        time.sleep(5)
+        a= self.driver.find_element_by_xpath('//*[@id="flex_cb"]/tbody')
+        print(a.text.split("\n"))
+
+
 if __name__ == '__main__':
-    a = CNNETETF()
-    for i in range(10):
-        a.get_result()
+    JISILUConvertibleBond().get_result()
+
+
+
