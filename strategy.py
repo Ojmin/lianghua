@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 from my_share import get_yesterday_amount, get_distance_of_delivery_day
 from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV, \
-    Germany30SPIFSpider, Germany30ETFSpider
+    Germany30SPIFSpider, Germany30ETFSpider, TencentSpider, XGHLSpider, CNNETETF
 
 """
 策略模式
@@ -513,13 +513,16 @@ class SoftMonitoring(Strategy):
         # self.var1 = tk.StringVar()
         # self.l1 = tk.Label(textvar=self.var1, bg="white",font='Helvetica -12 bold',relief="ridge")
         # self.l1.grid(row=1, column=1)
+        self.spider1 = TencentSpider()
+        self.spider2 = XGHLSpider()
+        self.spider3 = CNNETETF()
         self.tree_data = ttk.Treeview()
         # "T日溢价估算","164906-513050涨跌差","ADR_t",标签化
         self.tree_data["columns"] = ["change", "price", "value_t_1", "premium_t_1", "HKDCNYC", "HKcontribution",
                                      "HK_position", "USDCNYC", "ADR_position", "total_position", "premium_with_ADR",
-                                     "164906-tencent_change",
-                                     "513050-tencent_change", "164906-513050_change", "t_1_value_for_change",
-                                     "H11137+exchange_rate", "H30533exchange"
+                                     "164906_tencent_change",
+                                     "513050_tencent_change", "164906_513050_change", "t_1_value_for_change",
+                                     "H11137_exchange_rate", "H30533exchange"
                                      ]
         self.tree_data.column("change", width=60)
         self.tree_data.column("price", width=60)
@@ -533,8 +536,8 @@ class SoftMonitoring(Strategy):
         self.tree_data.column("ADR_position", width=60)
         self.tree_data.column("total_position", width=60)
         self.tree_data.column("premium_with_ADR", width=60)
-        self.tree_data.column("164906-tencent_change", width=60)
-        self.tree_data.column("513050-tencent_change", width=60)
+        self.tree_data.column("164906_tencent_change", width=60)
+        self.tree_data.column("513050_tencent_change", width=60)
 
         self.tree_data.heading("change", text="涨跌幅%")
         self.tree_data.heading("price", text="价格")
@@ -547,23 +550,93 @@ class SoftMonitoring(Strategy):
         self.tree_data.heading("ADR_position", text="ADR仓位")
         self.tree_data.heading("total_position", text="总仓位")
         self.tree_data.heading("premium_with_ADR", text="加ADR后溢价")
-        self.tree_data.heading("164906-tencent_change", text="164906-腾讯涨跌差")
-        self.tree_data.heading("513050-tencent_change", text="513050-腾讯涨跌差")
-        self.tree_data.heading("164906-513050_change", text="164906-513050涨跌差")
+        self.tree_data.heading("164906_tencent_change", text="164906-腾讯涨跌差")
+        self.tree_data.heading("513050_tencent_change", text="513050-腾讯涨跌差")
+        self.tree_data.heading("164906_513050_change", text="164906-513050涨跌差")
         self.tree_data.heading("t_1_value_for_change", text="T-1日净值计算涨跌幅")
-        self.tree_data.heading("H11137+exchange_rate", text="H11137+汇率涨跌幅")
+        self.tree_data.heading("H11137_exchange_rate", text="H11137+汇率涨跌幅")
         self.tree_data.heading("H30533exchange", text="H30533涨跌幅")
-        self.tree_data.grid(row=0,columnspan=2,padx=10,pady=5)
-        self.l1 = tk.Label(text="汇率涨跌-港币中间价HKDCNYC: ", bg="white").grid(row=0, column=0, padx=10, pady=5,stick=tk.E)
+        self.tree_data.grid(row=0, columnspan=2, padx=10, pady=5)
+        self.l1 = tk.Label(text="汇率涨跌-港币中间价HKDCNYC: ", bg="white").grid(row=0, column=0, padx=10, pady=5, stick=tk.E)
         self.entry1 = tk.Entry(width=20)
-        self.entry1.grid(row=0, column=1, padx=10, pady=5,stick=tk.W)
+        self.entry1.grid(row=0, column=1, padx=10, pady=5, stick=tk.W)
+
     def get_result(self):
         # 清空原列表
         x = self.tree_data.get_children()
         for item in x:
             self.tree_data.delete(item)
+        price_change = self.get_price_change()
         self.tree_data.insert('', 1, text='164906', values=(
-        '0%', 54, 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
+            price_change["zghl_price_change"][1],price_change["zghl_price_change"][0], 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1,
+            0.32, 0.52))
+        self.tree_data.insert('', 1, text='513050', values=(
+             price_change["cn_net_etf_price_change"][1],price_change["cn_net_etf_price_change"][0], 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
+        self.tree_data.insert('', 1, text='00700', values=(
+             price_change["tencent_price_change"][1],price_change["tencent_price_change"][0], 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
+
+    def get_price_change(self):
+        tencent_price_change = self.spider1.get_result()
+        zghl_price_change = self.spider2.get_result()
+        cn_net_etf_price_change = self.spider3.get_result()
+        return {"tencent_price_change": tencent_price_change, "zghl_price_change": zghl_price_change,
+                "cn_net_etf_price_change": cn_net_etf_price_change}
+
+
+def get_value_t_1(self):
+    pass
+
+
+def get_premium_t_1(self):
+    pass
+
+
+def get_HKDCNYC(self):
+    pass
+
+
+def get_HKcontribution(self):
+    pass
+
+
+def get_HK_position(self):
+    pass
+
+
+def get_ADR_position(self):
+    pass
+
+
+def get_total_position(self):
+    pass
+
+
+def get_premium_with_ADR(self):
+    pass
+
+
+def get_164906_tencent_change(self):
+    pass
+
+
+def get_513050_tencent_change(self):
+    pass
+
+
+def get_164906_513050_change(self):
+    pass
+
+
+def get_t_1_value_for_change(self):
+    pass
+
+
+def get_H11137_exchange_rate(self):
+    pass
+
+
+def get_H30533exchange(self):
+    pass
 
 
 class Context(object):

@@ -10,7 +10,7 @@ class Spider(object):
 
     def __init__(self):
         self.options = Options()
-        self.options.add_argument('--headless')
+        # self.options.add_argument('--headless')
         self.options.add_argument("--disable-gpu")
         self.options.add_argument("--hide-scrollbars")
         self.options.add_argument('blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
@@ -152,7 +152,8 @@ class HS300ETF(object):
         for i in (info_1, info_2, info_3, info_4, info_5, info_6):
             info = i.split(",")
             info_list.append(
-                {"name": info[0], "current_price": info[3], "buy1": info[11],"buy1_num":info[10], "sell1": info[21],"sell1_num":info[20], "volume": info[8]})
+                {"name": info[0], "current_price": info[3], "buy1": info[11], "buy1_num": info[10], "sell1": info[21],
+                 "sell1_num": info[20], "volume": info[8]})
         return info_list
 
 
@@ -177,5 +178,56 @@ class Germany30ETFSpider(Spider):
         return germany30_etf
 
 
+class TencentSpider(Spider):
+    def __init__(self):
+        super().__init__()
+        self.driver.get("https://xueqiu.com/S/00700")
+        self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/a').click()
+
+    def get_result(self):
+        self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[3]/i').click()
+        time.sleep(0.1)
+
+        price = self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("HK$", "")
+        change = \
+            self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(" ")[
+                1]
+        change = float(change.strip("%")) / 100
+        return (float(price), change)
+
+
+class XGHLSpider(Spider):
+    def __init__(self):
+        super().__init__()
+        self.driver.get("https://xueqiu.com/S/SZ164906")
+
+    def get_result(self):
+        price = float(self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", ""))
+        change = \
+            self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(" ")[
+                1]
+        change = float(change.strip("%")) / 100
+        return (price, change)
+
+
+class CNNETETF(Spider):
+    def __init__(self):
+        super().__init__()
+        self.driver.get("https://xueqiu.com/S/SH513050")
+
+    def get_result(self):
+        price = float(self.driver.find_element_by_xpath(
+            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", ""))
+        change = \
+            self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(" ")[
+                1]
+        change = float(change.strip("%")) / 100
+        return (price, change)
+
+
 if __name__ == '__main__':
-    print(HS300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360").get_result())
+    a = CNNETETF()
+    for i in range(10):
+        a.get_result()

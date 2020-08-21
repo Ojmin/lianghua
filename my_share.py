@@ -43,6 +43,9 @@ def get_distance_of_delivery_day():
     d1 = datetime.date.today()
     d2 = get_if_delivery_day(year, month)
     interval = d2 - d1  # 两日期差距
+    if interval.days == 0:
+        d2 = get_if_delivery_day(year, month + 1)
+        return float((d2 - d1).days)
     return float(interval.days)
 
 
@@ -78,4 +81,4 @@ class Calculation(object):
 
 
 if __name__ == '__main__':
-    pass
+    print(get_distance_of_delivery_day())
