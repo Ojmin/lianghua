@@ -1,3 +1,4 @@
+import json
 import time
 
 import requests
@@ -186,14 +187,18 @@ class TencentSpider(Spider):
 
     def get_result(self):
         self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[3]/i').click()
-        time.sleep(0.1)
+        time.sleep(0.2)
+        try:
+            price = self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("HK$", "")
+            change = \
+                self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(
+                    " ")[
+                    1]
+            change = float(change.strip("%")) / 100
 
-        price = self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("HK$", "")
-        change = \
-            self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(" ")[
-                1]
-        change = float(change.strip("%")) / 100
+        except:
+            return (1, "0")
         return (float(price), change)
 
 
@@ -227,18 +232,35 @@ class CNNETETF(Spider):
         return (price, change)
 
 
-class JISILUConvertibleBond(Spider):
+class JISILUConvertibleBond(object):
+    # def __init__(self):
+    #     super().__init__()
+    #     self.driver.get("https://www.jisilu.cn/data/cbnew/#cb")
+    # def get_result(self):
+    #     time.sleep(5)
+    #     a = self.driver.find_element_by_xpath('//*[@id="flex_cb"]/tbody')
+    #     print(a.text.split("\n"))
     def __init__(self):
-        super().__init__()
-        self.driver.get("https://www.jisilu.cn/data/cbnew/#cb")
+        self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/'
+
     def get_result(self):
-        time.sleep(5)
-        a= self.driver.find_element_by_xpath('//*[@id="flex_cb"]/tbody')
-        print(a.text.split("\n"))
+        r = json.loads(requests.get(self.url).text)
+        rows = r["rows"]
+        return rows
+
+
+class NetWorth(Spider):
+    def __init__(self, code):
+        super().__init__()
+        self.code = code
+        self.driver.get("http://fund.eastmoney.com/{}.html".format(self.code))
+
+    def get_result(self):
+        # T-2净值
+        net_worth_t_2 = self.driver.find_element_by_xpath('//*[@id="Li1"]/div[1]/table/tbody/tr[2]/td[2]')
+        self.close()
+        return  float(net_worth_t_2)
 
 
 if __name__ == '__main__':
     JISILUConvertibleBond().get_result()
-
-
-

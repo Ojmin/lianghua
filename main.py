@@ -1,10 +1,12 @@
 import tkinter as tk
 import threading
-from strategy import Context, YangQiETF, IF300ETF, Germany30Strategy, SoftMonitoring
+from strategy import Context, YangQiETF, IF300ETF, Germany30Strategy, SoftMonitoring, JiSiLuStrategy
 
 """
 Created by MinChengWen on 2020/8/12
 """
+
+
 
 
 class Tip(object):
@@ -101,9 +103,12 @@ class Window(tk.Tk):
         # strategy7 = Context(IF300ETF("sh510300", "sh510310", "sh510380", "sz159919", "sh515660", "sh515360"))
         # 德国30
         # strategy8 = Context(Germany30Strategy())
-        #监控
-        strategy9=Context(SoftMonitoring())
-        tip_list.append(strategy9)
+        # 监控
+        # strategy9=Context(SoftMonitoring())
+        # 集思录
+        strategy10 = Context(JiSiLuStrategy())
+        tip_list.append(strategy10)
+
         return tip_list
 
     def run(self):

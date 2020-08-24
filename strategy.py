@@ -1,17 +1,31 @@
 import datetime
-import re
 
 import requests
 import tkinter as tk
 from tkinter import ttk
+
 from my_share import get_yesterday_amount, get_distance_of_delivery_day
 from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV, \
-    Germany30SPIFSpider, Germany30ETFSpider, TencentSpider, XGHLSpider, CNNETETF
+    Germany30SPIFSpider, Germany30ETFSpider, TencentSpider, XGHLSpider, CNNETETF, JISILUConvertibleBond, NetWorth
 
 """
 策略模式
 Created by MinChengWen on 2020/8/12
 """
+
+
+class MyLabel(object):
+    def __init__(self, font='Helvetica -30 bold', width=50, height=3):
+        self.var = tk.StringVar()
+        self.l = tk.Label(textvar=self.var, font=font, width=width,
+                          height=height)
+        self.l.pack()
+
+    def set(self, msg):
+        self.var.set(msg)
+
+    def bg(self, bg="red"):
+        self.l["bg"] = bg
 
 
 class Strategy(object):
@@ -560,6 +574,9 @@ class SoftMonitoring(Strategy):
         self.l1 = tk.Label(text="汇率涨跌-港币中间价HKDCNYC: ", bg="white").grid(row=0, column=0, padx=10, pady=5, stick=tk.E)
         self.entry1 = tk.Entry(width=20)
         self.entry1.grid(row=0, column=1, padx=10, pady=5, stick=tk.W)
+        self.l2 = tk.Label(text="164906仓位： ", bg="white").grid(row=0, column=0, padx=10, pady=5, stick=tk.E)
+        self.entry2 = tk.Entry(width=20)
+        self.entry2.grid(row=0, column=1, padx=10, pady=5, stick=tk.W)
 
     def get_result(self):
         # 清空原列表
@@ -568,12 +585,15 @@ class SoftMonitoring(Strategy):
             self.tree_data.delete(item)
         price_change = self.get_price_change()
         self.tree_data.insert('', 1, text='164906', values=(
-            price_change["zghl_price_change"][1],price_change["zghl_price_change"][0], 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1,
+            price_change["zghl_price_change"][1], price_change["zghl_price_change"][0], 1.82, -0.22, -0.05, -0.006,
+            0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1,
             0.32, 0.52))
         self.tree_data.insert('', 1, text='513050', values=(
-             price_change["cn_net_etf_price_change"][1],price_change["cn_net_etf_price_change"][0], 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
+            price_change["cn_net_etf_price_change"][1], price_change["cn_net_etf_price_change"][0], 1.82, -0.22, -0.05,
+            -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
         self.tree_data.insert('', 1, text='00700', values=(
-             price_change["tencent_price_change"][1],price_change["tencent_price_change"][0], 1.82, -0.22, -0.05, -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
+            price_change["tencent_price_change"][1], price_change["tencent_price_change"][0], 1.82, -0.22, -0.05,
+            -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
 
     def get_price_change(self):
         tencent_price_change = self.spider1.get_result()
@@ -582,61 +602,85 @@ class SoftMonitoring(Strategy):
         return {"tencent_price_change": tencent_price_change, "zghl_price_change": zghl_price_change,
                 "cn_net_etf_price_change": cn_net_etf_price_change}
 
+    def get_value_t_1(self, code):
+        # 获取仓位
+        position = float(self.entry2.get())
+        # T-2净值
+        net_worth_t_2 = NetWorth(code).get_result()
+        # T-1估值
+        valuation_t_1 = net_worth_t_2 * position
 
-def get_value_t_1(self):
-    pass
+    def get_premium_t_1(self):
+        pass
 
+    def get_HKDCNYC(self):
+        pass
 
-def get_premium_t_1(self):
-    pass
+    def get_HKcontribution(self):
+        pass
 
+    def get_HK_position(self):
+        pass
 
-def get_HKDCNYC(self):
-    pass
+    def get_ADR_position(self):
+        pass
 
+    def get_total_position(self):
+        pass
 
-def get_HKcontribution(self):
-    pass
+    def get_premium_with_ADR(self):
+        pass
 
+    def get_164906_tencent_change(self):
+        pass
 
-def get_HK_position(self):
-    pass
+    def get_513050_tencent_change(self):
+        pass
 
+    def get_164906_513050_change(self):
+        pass
 
-def get_ADR_position(self):
-    pass
+    def get_t_1_value_for_change(self):
+        pass
 
+    def get_H11137_exchange_rate(self):
+        pass
 
-def get_total_position(self):
-    pass
-
-
-def get_premium_with_ADR(self):
-    pass
-
-
-def get_164906_tencent_change(self):
-    pass
-
-
-def get_513050_tencent_change(self):
-    pass
-
-
-def get_164906_513050_change(self):
-    pass
-
-
-def get_t_1_value_for_change(self):
-    pass
-
-
-def get_H11137_exchange_rate(self):
-    pass
+    def get_H30533exchange(self):
+        pass
 
 
-def get_H30533exchange(self):
-    pass
+class JiSiLuStrategy(Strategy):
+    def __init__(self):
+        super().__init__()
+        self.spider = JISILUConvertibleBond()
+        self.l1 = MyLabel(height=2)
+        self.l2 = MyLabel()
+        self.l3 = MyLabel()
+        self.l4 = MyLabel()
+        self.l5 = MyLabel()
+        self.l6 = MyLabel()
+        self.l7 = MyLabel()
+        self.l8 = MyLabel()
+        self.l9 = MyLabel()
+        self.l10 = MyLabel()
+        self.l_list = [self.l1, self.l2, self.l3, self.l4, self.l5, self.l6, self.l7, self.l8, self.l9, self.l10]
+
+
+    def get_result(self):
+        rows = self.spider.get_result()
+        print(1)
+        row_list = []
+        for row in rows:
+            premium_rt = float(row["cell"]["premium_rt"].strip("%")) / 100
+            if row["cell"]["convert_cd"] != "未到转股期" and premium_rt < -0.01:
+                row_list.append(row)
+        sorted(row_list, key=lambda x: float(x["cell"]["premium_rt"].strip("%")))
+        for i in range(len(row_list) if len(row_list) <= 10 else 10):
+            self.l_list[i].set(
+                row_list[i]["cell"]["bond_nm"] + row_list[i]["cell"]["stock_id"] + row_list[i]["cell"]["premium_rt"])
+            self.l_list[i].bg("red")
+
 
 
 class Context(object):
