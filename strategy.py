@@ -484,7 +484,6 @@ class Germany30Strategy(Strategy):
             return
 
     def flag_(self):
-        # T-1日513030估值
         self.my_flag = True
         return
 
@@ -493,7 +492,6 @@ class Germany30Strategy(Strategy):
         return
 
     def valuation_t(self):
-        # T日513030估值
         pass
 
 
@@ -501,35 +499,19 @@ class SoftMonitoring(Strategy):
 
     def __init__(self):
         super().__init__()
-        # tk.Label(text="涨跌幅%", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=1)
-        # tk.Label(text="价格", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=2)
-        # tk.Label(text="T-1日净值", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=3)
-        # tk.Label(text="相对T-1日溢价", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=4)
-        # tk.Label(text="HKDCNYC", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=5)
-        # tk.Label(text="港股贡献", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=6)
-        # tk.Label(text="港股仓位", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=7)
-        # tk.Label(text="T日溢价估算", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=8)
-        # tk.Label(text="USDCNYC", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=9)
-        # tk.Label(text="T日ADR贡献参考", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=10)
-        # tk.Label(text="ADR仓位", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=11)
-        # tk.Label(text="总仓位", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=12)
-        # tk.Label(text="加ADR后溢价", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=13)
-        # tk.Label(text="164906\n腾讯涨跌差", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=14)
-        # tk.Label(text="513050\n腾讯涨跌差", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=15)
-        # tk.Label(text="164906-513050\n涨跌差", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=16)
-        # tk.Label(text="T-1日净值计算涨跌幅", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=17)
-        # tk.Label(text="H11137+汇率涨跌幅", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=18)
-        # tk.Label(text="H30533涨跌幅", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=0, column=19)
-        #
-        # tk.Label(text="164906", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=1, column=0)
-        # tk.Label(text="513050", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=2, column=0)
-        # tk.Label(text="00700", bg="white",relief="ridge",font='Helvetica -12 bold',).grid(row=3, column=0)
-        # self.var1 = tk.StringVar()
-        # self.l1 = tk.Label(textvar=self.var1, bg="white",font='Helvetica -12 bold',relief="ridge")
-        # self.l1.grid(row=1, column=1)
+
+        self.my_flag = False
+
+        tk.Button(text="启动", width=10, bg="grey", command=self.flag_).grid(row=6, column=0,
+                                                                           padx=10, pady=5)
+        tk.Button(text="停止", width=10, bg="grey", command=self.flag__).grid(row=6, column=1,
+                                                                            padx=10, pady=5)
+
         self.spider1 = TencentSpider()
         self.spider2 = XGHLSpider()
         self.spider3 = CNNETETF()
+        self.value_t_2_513050 = NetWorth("513050").get_result()
+        self.value_t_2_164906 = NetWorth("164906").get_result()
         self.tree_data = ttk.Treeview()
         # "T日溢价估算","164906-513050涨跌差","ADR_t",标签化
         self.tree_data["columns"] = ["change", "price", "value_t_1", "premium_t_1", "HKDCNYC", "HKcontribution",
@@ -571,28 +553,56 @@ class SoftMonitoring(Strategy):
         self.tree_data.heading("H11137_exchange_rate", text="H11137+汇率涨跌幅")
         self.tree_data.heading("H30533exchange", text="H30533涨跌幅")
         self.tree_data.grid(row=0, columnspan=2, padx=10, pady=5)
-        self.l1 = tk.Label(text="汇率涨跌-港币中间价HKDCNYC: ", bg="white").grid(row=0, column=0, padx=10, pady=5, stick=tk.E)
+        self.l1 = tk.Label(text="汇率涨跌-港币中间价HKDCNYC: ", bg="white").grid(row=1, column=0, padx=10, pady=5, stick=tk.E)
         self.entry1 = tk.Entry(width=20)
-        self.entry1.grid(row=0, column=1, padx=10, pady=5, stick=tk.W)
-        self.l2 = tk.Label(text="164906仓位： ", bg="white").grid(row=0, column=0, padx=10, pady=5, stick=tk.E)
+        self.entry1.grid(row=1, column=1, padx=10, pady=5, stick=tk.W)
+        self.l2 = tk.Label(text="164906仓位： ", bg="white").grid(row=2, column=0, padx=10, pady=5, stick=tk.E)
         self.entry2 = tk.Entry(width=20)
-        self.entry2.grid(row=0, column=1, padx=10, pady=5, stick=tk.W)
+        self.entry2.grid(row=2, column=1, padx=10, pady=5, stick=tk.W)
+        self.l3 = tk.Label(text="513050仓位： ", bg="white").grid(row=3, column=0, padx=10, pady=5, stick=tk.E)
+        self.entry3 = tk.Entry(width=20)
+        self.entry3.grid(row=3, column=1, padx=10, pady=5, stick=tk.W)
+        self.l4 = tk.Label(text="h11137T-1的涨跌幅： ", bg="white").grid(row=4, column=0, padx=10, pady=5, stick=tk.E)
+        self.entry4 = tk.Entry(width=20)
+        self.entry4.grid(row=4, column=1, padx=10, pady=5, stick=tk.W)
+        self.l5 = tk.Label(text="汇率涨跌-美元中间价USDCNYC: ", bg="white").grid(row=5, column=0, padx=10, pady=5, stick=tk.E)
+        self.entry5 = tk.Entry(width=20)
+        self.entry5.grid(row=5, column=1, padx=10, pady=5, stick=tk.W)
+        self.my_dict = {"00700": "tencent_price_change", "513050": "cn_net_etf_price_change",
+                        "164906": "zghl_price_change"}
+        # 固定的
+        # self._164906_value_t_1 = self.get_164906_value_t_1(self.entry2.get())
+        # self._513050_value_t_1 = self.get_513050_value_t_1(self.entry3.get())
+
+    def flag_(self):
+        self.my_flag = True
+        return
+
+    def flag__(self):
+        self.my_flag = False
+        return
 
     def get_result(self):
-        # 清空原列表
+        if not self.my_flag:
+            return
+            # 清空原列表
         x = self.tree_data.get_children()
         for item in x:
             self.tree_data.delete(item)
         price_change = self.get_price_change()
         self.tree_data.insert('', 1, text='164906', values=(
-            price_change["zghl_price_change"][1], price_change["zghl_price_change"][0], 1.82, -0.22, -0.05, -0.006,
+            str(price_change["zghl_price_change"][1] * 100) + "%", price_change["zghl_price_change"][0],
+            self.get_164906_value_t_1(), -0.22,
+            -0.05, -0.006,
             0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1,
             0.32, 0.52))
         self.tree_data.insert('', 1, text='513050', values=(
-            price_change["cn_net_etf_price_change"][1], price_change["cn_net_etf_price_change"][0], 1.82, -0.22, -0.05,
+            str(price_change["cn_net_etf_price_change"][1] * 100) + "%", price_change["cn_net_etf_price_change"][0],
+            self.get_513050_value_t_1(), -0.22, -0.05,
             -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
         self.tree_data.insert('', 1, text='00700', values=(
-            price_change["tencent_price_change"][1], price_change["tencent_price_change"][0], 1.82, -0.22, -0.05,
+            str(price_change["tencent_price_change"][1] * 100) + "%", price_change["tencent_price_change"][0], 1.82,
+            -0.22, -0.05,
             -0.006, 0.32, 8.2, 0.32, 0.51, -0.98, 0.5, 0.32, 0.8, 0.32, 0.1, 0.32, 0.52))
 
     def get_price_change(self):
@@ -602,24 +612,69 @@ class SoftMonitoring(Strategy):
         return {"tencent_price_change": tencent_price_change, "zghl_price_change": zghl_price_change,
                 "cn_net_etf_price_change": cn_net_etf_price_change}
 
-    def get_value_t_1(self, code):
+    def get_164906_value_t_1(self):
+        """164906T-1日净值"""
         # 获取仓位
         position = float(self.entry2.get())
         # T-2净值
-        net_worth_t_2 = NetWorth(code).get_result()
+        net_worth_t_2 = float(self.value_t_2_164906)
+        # T-1日H11137涨跌
+        change_h11137 = float(self.entry4.get())
+        # USDCNYC前一日的数据
+        usdcnyc = float(self.entry5.get())
         # T-1估值
-        valuation_t_1 = net_worth_t_2 * position
+        valuation_t_1 = (1 + position * (change_h11137 + usdcnyc)) * net_worth_t_2
+        print(valuation_t_1)
+        return valuation_t_1
 
-    def get_premium_t_1(self):
+    def get_513050_value_t_1(self):
+        """513050T-1日净值"""
+        # 获取仓位
+        position = float(self.entry3.get())
+        # T-2净值
+        net_worth_t_2 = float(self.value_t_2_513050)
+        # T-1日H11137涨跌
+        change_h11137 = float(self.entry4.get())
+        # USDCNYC前一日的数据
+        usdcnyc = float(self.entry5.get())
+        # T-1估值
+        valuation_t_1 = (1 + position * (change_h11137 + usdcnyc)) * net_worth_t_2
+        print(valuation_t_1)
+        return valuation_t_1
+
+    def get_513050_premium_t_1(self, code, price_change):
+        """计算T-1日的溢价"""
+        name = self.my_dict[code]
+        price = price_change[name][0]
+
+        pass
+
+    def get_164906_premium_t_1(self):
+        """计算164906的T-1溢价"""
+        pass
+
+    def get_164906_hk_contribution(self):
+        """计算164906的港股贡献"""
+        pass
+
+    def get_513050_hk_contribution(self):
+        """计算513050的港股贡献"""
+        pass
+
+    def get_164906_hk_position(self):
+        """计算港股仓位"""
+        pass
+
+    def get_513050_hk_position(self):
+        """计算513050的港股仓位"""
         pass
 
     def get_HKDCNYC(self):
+        """汇率涨跌-港币中间价"""
         pass
 
-    def get_HKcontribution(self):
-        pass
-
-    def get_HK_position(self):
+    def get_USDCNYC(self):
+        """汇率涨跌-美元中间价"""
         pass
 
     def get_ADR_position(self):
@@ -654,33 +709,35 @@ class JiSiLuStrategy(Strategy):
     def __init__(self):
         super().__init__()
         self.spider = JISILUConvertibleBond()
-        self.l1 = MyLabel(height=2)
-        self.l2 = MyLabel()
-        self.l3 = MyLabel()
-        self.l4 = MyLabel()
-        self.l5 = MyLabel()
-        self.l6 = MyLabel()
-        self.l7 = MyLabel()
-        self.l8 = MyLabel()
-        self.l9 = MyLabel()
-        self.l10 = MyLabel()
+        self.l1 = MyLabel(height=2, width=60)
+        self.l2 = MyLabel(height=2, width=60)
+        self.l3 = MyLabel(height=2, width=60)
+        self.l4 = MyLabel(height=2, width=60)
+        self.l5 = MyLabel(height=2, width=60)
+        self.l6 = MyLabel(height=2, width=60)
+        self.l7 = MyLabel(height=2, width=60)
+        self.l8 = MyLabel(height=2, width=60)
+        self.l9 = MyLabel(height=2, width=60)
+        self.l10 = MyLabel(height=2, width=60)
         self.l_list = [self.l1, self.l2, self.l3, self.l4, self.l5, self.l6, self.l7, self.l8, self.l9, self.l10]
-
 
     def get_result(self):
         rows = self.spider.get_result()
-        print(1)
         row_list = []
         for row in rows:
             premium_rt = float(row["cell"]["premium_rt"].strip("%")) / 100
             if row["cell"]["convert_cd"] != "未到转股期" and premium_rt < -0.01:
                 row_list.append(row)
         sorted(row_list, key=lambda x: float(x["cell"]["premium_rt"].strip("%")))
-        for i in range(len(row_list) if len(row_list) <= 10 else 10):
+        for i in range(len(row_list)):
             self.l_list[i].set(
-                row_list[i]["cell"]["bond_nm"] + row_list[i]["cell"]["stock_id"] + row_list[i]["cell"]["premium_rt"])
+                row_list[i]["cell"]["bond_nm"] + row_list[i]["cell"]["bond_id"] + " " + row_list[i]["cell"][
+                    "premium_rt"] + "正股成交额：" + row_list[i]["cell"]["svolume"] + "转债成交额：" + row_list[i]["cell"][
+                    "volume"])
             self.l_list[i].bg("red")
-
+        for i in range(len(row_list), 10):
+            self.l_list[i].set("")
+            self.l_list[i].bg("white")
 
 
 class Context(object):

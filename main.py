@@ -104,10 +104,10 @@ class Window(tk.Tk):
         # 德国30
         # strategy8 = Context(Germany30Strategy())
         # 监控
-        # strategy9=Context(SoftMonitoring())
+        strategy9=Context(SoftMonitoring())
         # 集思录
-        strategy10 = Context(JiSiLuStrategy())
-        tip_list.append(strategy10)
+        # strategy10 = Context(JiSiLuStrategy())
+        tip_list.append(strategy9)
 
         return tip_list
 
@@ -117,4 +117,4 @@ class Window(tk.Tk):
 
 if __name__ == '__main__':
     aa = Window()
-    aa.refresh_data(wait_time=500)
+    aa.refresh_data(wait_time=800)

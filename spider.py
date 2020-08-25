@@ -223,12 +223,16 @@ class CNNETETF(Spider):
         self.driver.get("https://xueqiu.com/S/SH513050")
 
     def get_result(self):
-        price = float(self.driver.find_element_by_xpath(
-            '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", ""))
-        change = \
-            self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(" ")[
-                1]
-        change = float(change.strip("%")) / 100
+        try:
+            price = float(self.driver.find_element_by_xpath(
+                '//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[1]/strong').text.replace("¥", ""))
+            change = \
+                self.driver.find_element_by_xpath('//*[@id="app"]/div[2]/div[2]/div[5]/div/div[1]/div[2]').text.split(
+                    " ")[
+                    1]
+            change = float(change.strip("%")) / 100
+        except:
+            return (0, 0)
         return (price, change)
 
 
@@ -257,10 +261,10 @@ class NetWorth(Spider):
 
     def get_result(self):
         # T-2净值
-        net_worth_t_2 = self.driver.find_element_by_xpath('//*[@id="Li1"]/div[1]/table/tbody/tr[2]/td[2]')
+        net_worth_t_2 = self.driver.find_element_by_xpath('//*[@id="Li1"]/div[1]/table/tbody/tr[2]/td[2]').text
         self.close()
-        return  float(net_worth_t_2)
+        return float(net_worth_t_2)
 
 
 if __name__ == '__main__':
-    JISILUConvertibleBond().get_result()
+    NetWorth("513050").get_result()
