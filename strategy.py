@@ -4,6 +4,10 @@ import requests
 import tkinter as tk
 from tkinter import ttk
 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+
+from main import Window
 from my_share import get_yesterday_amount, get_distance_of_delivery_day
 from spider import YangQiETFSpider, YangQiIndexSpider, IFSpider, HS300ETF, HS300IndexSpider, HS300IOPV, \
     Germany30SPIFSpider, Germany30ETFSpider, TencentSpider, XGHLSpider, CNNETETF, JISILUConvertibleBond, NetWorth

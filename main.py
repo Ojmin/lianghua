@@ -1,12 +1,10 @@
 import tkinter as tk
 import threading
-from strategy import Context, YangQiETF, IF300ETF, Germany30Strategy, SoftMonitoring, JiSiLuStrategy
+from strategy import Context, YangQiETF, IF300ETF, Germany30Strategy, SoftMonitoring, JiSiLuStrategy, BondPremium
 
 """
 Created by MinChengWen on 2020/8/12
 """
-
-
 
 
 class Tip(object):
@@ -50,6 +48,7 @@ class Window(tk.Tk):
         self.notice(self.strategy_list)
 
         self.after(wait_time, self.refresh_data)  # 这里的10000单位为毫秒
+
 
     @staticmethod
     def notice(strategy_list):
@@ -104,10 +103,12 @@ class Window(tk.Tk):
         # 德国30
         # strategy8 = Context(Germany30Strategy())
         # 监控
-        strategy9=Context(SoftMonitoring())
+        # strategy9=Context(SoftMonitoring())
         # 集思录
         # strategy10 = Context(JiSiLuStrategy())
-        tip_list.append(strategy9)
+        # 转债图
+        strategy11 = Context(BondPremium())
+        tip_list.append(strategy11)
 
         return tip_list
 
