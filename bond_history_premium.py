@@ -21,6 +21,8 @@ class Draw(object):
         plt.xticks(rotation=90)  # 设置横坐标显示的角度，角度是逆时针，自己看
         plt.rcParams['font.sans-serif'] = ['SimHei']  # 显示中文标签
         plt.rcParams['axes.unicode_minus'] = False
+        plt.grid()  # 生成网格
+        plt.yticks(np.arange(-0.05, 0.05, 0.01))
 
     # def get_history_data(self, code, frequency='60s'):
     #     return history(symbol=code, frequency=frequency, start_time=self.start_time,
@@ -53,7 +55,6 @@ class Draw(object):
 
     def draw(self, code, trans_price, color, label):
         x1, y1 = self.get_x_y(code, trans_price)
-        plt.yticks(np.arange(-0.05, 0.05, 0.01))
         plt.plot(x1, y1, color, label=label)
 
     def run(self):
@@ -64,6 +65,7 @@ class Draw(object):
         self.draw("SHSE.601966", 18.12, "k", label="玲珑轮胎")
         self.draw("SHSE.603180", 44.14, "m", label="金牌橱柜")
         self.draw("SZSE.002013", 7.57, "y", label="中航机电")
+
         plt.legend()
         plt.savefig('my_picture/{}.png'.format(self.start_time.strftime('%Y-%m-%d %H:%M:%S').split(" ")[0]), dpi=500,
                     bbox_inches='tight')
