@@ -42,6 +42,7 @@ class Draw(object):
             premium_rt = premium_rate if premium_rate <= 0.005 else 0.005
             x_time.append(x_time_.strftime("%Y-%m-%d %H:%M:%S"))
             y_value.append(premium_rt)
+            print(x_time_,code,bond_code,y_value_,bond_price)
         return x_time, y_value
 
     @staticmethod
@@ -101,9 +102,6 @@ class Draw(object):
         plt.savefig('my_picture/{}.png'.format(self.start_time.strftime('%Y-%m-%d %H:%M:%S').split(" ")[0]), dpi=500,
                     bbox_inches='tight')
         plt.show()
-
-
-
 
 
 def run(start_time, days):
