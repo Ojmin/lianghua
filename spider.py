@@ -167,6 +167,11 @@ class Germany30SPIFSpider(Spider):
         germany30_spif = float(self.driver.find_element_by_xpath('//*[@id="last_last"]').text.replace(",", ""))
         return germany30_spif
 
+    def get_result2(self):
+        increase = self.driver.find_element_by_xpath(
+            '//*[@id="quotes_summary_current_data"]/div[1]/div[2]/div[1]/span[4]').text
+        return float(increase.strip("%")) / 100
+
 
 class Germany30ETFSpider(Spider):
     def __init__(self):
@@ -267,4 +272,4 @@ class NetWorth(Spider):
 
 
 if __name__ == '__main__':
-    NetWorth("513050").get_result()
+    print(Germany30SPIFSpider().get_result2())
