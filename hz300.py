@@ -43,7 +43,7 @@ def draw(start_time, end_time):
     plt.grid()  # 生成网格
     plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(2))  # 密度总坐标数除70
     plt.xticks(rotation=60, fontsize=3)  # 设置横坐标显示的角度，角度是逆时针
-    c = get_c()*1.43
+    c = get_c()
     print(c)
     x_time = []
     y_increase = []
