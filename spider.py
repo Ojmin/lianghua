@@ -12,6 +12,8 @@ class Spider(object):
     def __init__(self):
         self.options = Options()
         # self.options.add_argument('--headless')
+        self.options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
         self.options.add_argument("--disable-gpu")
         self.options.add_argument("--hide-scrollbars")
         self.options.add_argument('blink-settings=imagesEnabled=false')  # 不加载图片, 提升速度
