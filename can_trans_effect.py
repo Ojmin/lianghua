@@ -1,11 +1,14 @@
 import json
 import re
-
+import datetime
 import requests
-from iFinDPy import *
+from iFinDPy import THS_iFinDLogin, THS_HistoryQuotes
+import pandas as pd
 
 THS_iFinDLogin("jztz093", "165805")
+from EmQuantAPI import *
 
+loginresult = c.start()
 data = {'128128': {'cd': '2021-02-26', 'name': '齐翔转2', 'stock_id': 'sz002408', 'stock_nm': '齐翔腾达'},
         '113581': {'cd': '2020-10-29', 'name': '龙蟠转债', 'stock_id': 'sh603906', 'stock_nm': '龙蟠科技'},
         '113575': {'cd': '2020-10-15', 'name': '东时转债', 'stock_id': 'sh603377', 'stock_nm': '东方时尚'},
@@ -301,7 +304,6 @@ data = {'128128': {'cd': '2021-02-26', 'name': '齐翔转2', 'stock_id': 'sz0024
         '113589': {'cd': '2021-01-04', 'name': '天创转债', 'stock_id': 'sh603608', 'stock_nm': '天创时尚'},
         '128072': {'cd': '2020-02-26', 'name': '翔鹭转债', 'stock_id': 'sz002842', 'stock_nm': '翔鹭钨业'},
         '128101': {'cd': '2020-09-21', 'name': '联创转债', 'stock_id': 'sz002036', 'stock_nm': '联创电子'},
-        '132008': {'cd': '2018-04-26', 'name': '17山高EB', 'stock_id': 'sh600350', 'stock_nm': '山东高速'},
         '128032': {'cd': '2018-06-29', 'name': '双环转债', 'stock_id': 'sz002472', 'stock_nm': '双环传动'},
         '113508': {'cd': '2018-11-05', 'name': '新凤转债', 'stock_id': 'sh603225', 'stock_nm': '新凤鸣'},
         '128041': {'cd': '2019-01-23', 'name': '盛路转债', 'stock_id': 'sz002446', 'stock_nm': '盛路通信'},
@@ -341,36 +343,51 @@ def get_trans_date():
     print(my_dict)
 
 
+result = {"stock_id": [], "sh_index_change": [], "sz_index_change": [], "stock_change": [], "transday": []}
+
+
 def get_transday_T1_stock_change(stock_id, transday, ):
-    
-    
     try:
         prefix = stock_id[:2]
         code = stock_id[2:]
-        date_transday = datetime.strptime(transday, "%Y-%m-%d")
-        today = datetime.today()
+        T1day = c.getdate(tradedate=transday, offday=1).Data[0].replace("/", "-")
+        
+        date_transday = datetime.datetime.strptime(T1day, "%Y-%m-%d").date()
+        T1day2 = date_transday.strftime("%Y-%m-%d")
+        today = datetime.datetime.today().date()
         if date_transday >= today:
+            print("未到转股期", stock_id)
             return
+        
         stock_info = THS_HistoryQuotes(code + "." + prefix.upper(), 'changeRatio',
-                                       'Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous', transday,
-                                       transday, True)
+                                       'Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous', T1day2,
+                                       T1day2, True)
         sh_info = THS_HistoryQuotes("000001.SH", 'changeRatio',
-                                    'Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous', transday,
-                                    transday, True)
-        sz_info = THS_HistoryQuotes("399001.SZ", 'changeRatio',
-                                    'Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous', transday,
-                                    transday, True)
+                                    'Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous', T1day2,
+                                    T1day2, True)
+        sz_info = THS_HistoryQuotes("399001.SZ",'changeRatio','Interval:D,CPS:1,baseDate:1900-01-01,Currency:YSHB,fill:Previous',T1day2,T1day2,True)
         stock_change = json.loads(stock_info)["tables"][0]["table"]["changeRatio"][0]
         sh_index_change = json.loads(sh_info)["tables"][0]["table"]["changeRatio"][0]
         sz_index_change = json.loads(sz_info)["tables"][0]["table"]["changeRatio"][0]
-        print("stock_id:", stock_id, "sh:", sh_index_change, "sz:", sz_index_change, "stock_change:", stock_change)
-    except:
-        pass
+        result["stock_id"].append(stock_id)
+        result["sh_index_change"].append(sh_index_change)
+        result["sz_index_change"].append(sz_index_change)
+        result["stock_change"].append(stock_change)
+        result["transday"].append(transday)
+        print(stock_id, "计算偏离成功")
+    except Exception as e:
+        print(stock_id, e, T1day2)
+
+
+def wirte_to_excel():
+    df = pd.DataFrame(result)
+    df.to_excel("transT1.xlsx", index=False)
 
 
 def run():
     for k, v in data.items():
         get_transday_T1_stock_change(v["stock_id"], v["cd"])
+    wirte_to_excel()
 
 
 if __name__ == '__main__':
