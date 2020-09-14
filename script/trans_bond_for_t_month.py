@@ -24,16 +24,16 @@ data = {
     #         '128102': {'cd': '2020-09-25', 'name': '海大转债', 'stock_id': 'sz002311', 'stock_nm': '海大集团'},
     #         '128115': {'cd': '2021-01-04', 'name': '巨星转债', 'stock_id': 'sz002444', 'stock_nm': '巨星科技'},
     #         '113592': {'cd': '2021-01-14', 'name': '安20转债', 'stock_id': 'sh603345', 'stock_nm': '安井食品'},
-    '123037': {'cd': '2020-06-29', 'name': '新莱转债', 'stock_id': 'sz300260', 'stock_nm': '新莱应材'},}
-        # '113572': {'cd': '2020-09-18', 'name': '三祥转债', 'stock_id': 'sh603663', 'stock_nm': '三祥新材'},
-        # '128108': {'cd': '2020-12-03', 'name': '蓝帆转债', 'stock_id': 'sz002382', 'stock_nm': '蓝帆医疗'},
-        # '113544': {'cd': '2020-03-26', 'name': '桃李转债', 'stock_id': 'sh603866', 'stock_nm': '桃李面包'},
-        # '123056': {'cd': '2021-01-04', 'name': '雪榕转债', 'stock_id': 'sz300511', 'stock_nm': '雪榕生物'},
-        # '113554': {'cd': '2020-06-22', 'name': '仙鹤转债', 'stock_id': 'sh603733', 'stock_nm': '仙鹤股份'},
-        # '110058': {'cd': '2019-10-22', 'name': '永鼎转债', 'stock_id': 'sh600105', 'stock_nm': '永鼎股份'},
-        # '128098': {'cd': '2020-09-11', 'name': '康弘转债', 'stock_id': 'sz002773', 'stock_nm': '康弘药业'},
-        # '113543': {'cd': '2020-02-24', 'name': '欧派转债', 'stock_id': 'sh603833', 'stock_nm': '欧派家居'},
-        # '113509': {'cd': '2018-12-10', 'name': '新泉转债', 'stock_id': 'sh603179', 'stock_nm': '新泉股份'},}
+    '123037': {'cd': '2020-06-29', 'name': '新莱转债', 'stock_id': 'sz300260', 'stock_nm': '新莱应材'},
+        '113572': {'cd': '2020-09-18', 'name': '三祥转债', 'stock_id': 'sh603663', 'stock_nm': '三祥新材'},
+        '128108': {'cd': '2020-12-03', 'name': '蓝帆转债', 'stock_id': 'sz002382', 'stock_nm': '蓝帆医疗'},
+        '113544': {'cd': '2020-03-26', 'name': '桃李转债', 'stock_id': 'sh603866', 'stock_nm': '桃李面包'},
+        '123056': {'cd': '2021-01-04', 'name': '雪榕转债', 'stock_id': 'sz300511', 'stock_nm': '雪榕生物'},
+        '113554': {'cd': '2020-06-22', 'name': '仙鹤转债', 'stock_id': 'sh603733', 'stock_nm': '仙鹤股份'},
+        '110058': {'cd': '2019-10-22', 'name': '永鼎转债', 'stock_id': 'sh600105', 'stock_nm': '永鼎股份'},
+        '128098': {'cd': '2020-09-11', 'name': '康弘转债', 'stock_id': 'sz002773', 'stock_nm': '康弘药业'},
+        '113543': {'cd': '2020-02-24', 'name': '欧派转债', 'stock_id': 'sh603833', 'stock_nm': '欧派家居'},
+        '113509': {'cd': '2018-12-10', 'name': '新泉转债', 'stock_id': 'sh603179', 'stock_nm': '新泉股份'},}
 #         '128084': {'cd': '2020-06-22', 'name': '木森转债', 'stock_id': 'sz002745', 'stock_nm': '木林森'},
 #         '128096': {'cd': '2020-08-17', 'name': '奥瑞转债', 'stock_id': 'sz002701', 'stock_nm': '奥瑞金'},
 #         '113547': {'cd': '2020-04-30', 'name': '索发转债', 'stock_id': 'sh603612', 'stock_nm': '索通发展'},
@@ -341,7 +341,7 @@ for k, v in data.items():
         x.append(index)
         y1.append(stock_change)
         y2.append(zz500_change)
-    plt.figure(num=1, figsize=(15, 8), dpi=500)
+    plt.figure(num=1, figsize=(15, 8), dpi=80)
     plt.grid()  # 生成网格
     plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(1))  # 密度总坐标数除70
     plt.xticks(rotation=60, fontsize=3)  # 设置横坐标显示的角度，角度是逆时针，自己看
@@ -349,10 +349,9 @@ for k, v in data.items():
     plt.rcParams['axes.unicode_minus'] = False
     plt.plot(x,y1,label=v["stock_id"])
     plt.plot(x,y2,label="中证500")
-    plt.legend(fontsize=3)
+    plt.legend(fontsize=10)
 
-    plt.savefig('../picture_data/picture_zz500_bond_trans_T30/{}.png'.format(v["stock_id"]), dpi=500,
+    plt.savefig('../picture_data/picture_zz500_bond_trans_T30/{}.png'.format(v["stock_id"]), dpi=300,
                 bbox_inches='tight')
     plt.show()
-    time.sleep(10)
 # c.stop()
