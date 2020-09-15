@@ -88,6 +88,7 @@ def get_trans_price(name, date):
     return trans_price
 
 
+
 def config():
     plt.grid()  # 生成网格
     plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(20))  # 密度总坐标数除70
