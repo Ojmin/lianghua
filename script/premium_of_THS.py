@@ -7,40 +7,40 @@ import datetime
 
 # Create By MinChengwen on 2020 9 8
 
-# import time
-# from spider import Spider
+import time
+from spider import Spider
 
-# class JSLSpider(Spider):
-#     def __init__(self):
-#         super().__init__()
-#
-#         self.driver.get("https://www.jisilu.cn/web/data/cb/list")
-#         self.driver.implicitly_wait(10)
-#
-#     def get_result(self):
-#         time.sleep(2)
-#         my_list = ""
-#         i = 0
-#         while True:
-#
-#             self.driver.execute_script("window.scrollTo(0,{})".format(i))
-#
-#             time.sleep(2)
-#
-#             tr = self.driver.find_element_by_xpath(
-#                 '//[@id="app"]/div/div[2]/div[2]/div[2]/div[2]/div[2]/div[3]/table/tbody').text
-#             my_list += tr
-#             check_height1 = self.driver.execute_script("return document.body.scrollHeight;")
-#
-#             if i >= check_height1:
-#                 break
-#             i += 1000
-#         return my_list
-#
-#
+class JSLSpider(Spider):
+    def __init__(self):
+        super().__init__()
+
+        self.driver.get("https://www.jisilu.cn/web/data/cb/list")
+        self.driver.implicitly_wait(10)
+
+    def get_result(self):
+        time.sleep(2)
+        my_list = ""
+        i = 0
+        while True:
+
+            self.driver.execute_script("window.scrollTo(0,{})".format(i))
+
+            time.sleep(2)
+
+            tr = self.driver.find_element_by_xpath(
+                '//[@id="app"]/div/div[2]/div[2]/div[2]/div[2]/div[2]/div[3]/table/tbody').text
+            my_list += tr
+            check_height1 = self.driver.execute_script("return document.body.scrollHeight;")
+
+            if i >= check_height1:
+                break
+            i += 1000
+        return my_list
+
+
 # spider = JSLSpider()
-#
-#
+
+
 # def create_my_dict():
 #     my_dict = {}
 #     bond_list = spider.get_result().split("\n\ue61e\n")
@@ -786,7 +786,6 @@ class Window(tk.Tk):
             bond_changeRatio = data[i]["bond_changeRatio"]
             stock_changeRatio = data[i]["stock_changeRatio"]
             bond_price = data[i]["bond_price"]
-            self.l_list[i].set(bond_code + bond_name + "溢价率:" + str(premium_rate) + "")
             self.l_list[i].set(bond_code + bond_name + "溢价率：" + (str(100 * premium_rate))[:6] + "%" + "转债涨跌：" + (str(
                 bond_changeRatio))[:4] + "%" + "正股涨跌：" + (str(stock_changeRatio))[:4] + "%" + "转债价格：" + str(bond_price)[
                                                                                                         :6] + "转债成交额：" + str(
