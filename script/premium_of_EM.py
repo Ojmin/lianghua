@@ -2,8 +2,16 @@ import time
 
 from EmQuantAPI import *
 
-from script.premium_of_THS import MyLabel2
 import tkinter as tk
+import redis  # 导入redis模块，通过python操作redis 也可以直接在redis主机的服务端操作缓存数据库
+
+from script.redis_pool import r
+
+c.start(options='ForceLogin=1')
+
+
+
+
 
 my_dict = {
     # '113581': {'bond_name': '龙蟠转债', 'stock_name': '龙蟠科技', 'bond_code': '113581', 'stock_code': '603906',
@@ -50,8 +58,8 @@ my_dict = {
     #            'trans_price': '17.61'},
     '123030': {'bond_name': '九洲转债', 'stock_name': '九洲集团', 'bond_code': '123030', 'stock_code': '300040',
                'trans_price': '5.65'},
-    '123037': {'bond_name': '新莱转债 ', 'stock_name': '新莱应材', 'bond_code': '123037', 'stock_code': '300260',
-               'trans_price': '11.08'},
+    # '123037': {'bond_name': '新莱转债 ', 'stock_name': '新莱应材', 'bond_code': '123037', 'stock_code': '300260',
+    #            'trans_price': '11.08'},
     # '128098': {'bond_name': '康弘转债', 'stock_name': '康弘药业R', 'bond_code': '128098', 'stock_code': '002773',
     #            'trans_price': '35.30'},
     '123002': {'bond_name': '国祯转债', 'stock_name': '国祯环保', 'bond_code': '123002', 'stock_code': '300388',
@@ -64,18 +72,18 @@ my_dict = {
     #            'trans_price': '13.56'},
     # '128102': {'bond_name': '海大转债', 'stock_name': '海大集团R', 'bond_code': '128102', 'stock_code': '002311',
     #            'trans_price': '34.74'},
-    '123022': {'bond_name': '长信转债 ', 'stock_name': '长信科技R', 'bond_code': '123022', 'stock_code': '300088',
-               'trans_price': '6.15'},
-    '113561': {'bond_name': '正裕转债', 'stock_name': '正裕工业', 'bond_code': '113561', 'stock_code': '603089',
-               'trans_price': '10.23'},
+    # '123022': {'bond_name': '长信转债 ', 'stock_name': '长信科技R', 'bond_code': '123022', 'stock_code': '300088',
+    #            'trans_price': '6.15'},
+    # '113561': {'bond_name': '正裕转债', 'stock_name': '正裕工业', 'bond_code': '113561', 'stock_code': '603089',
+    #            'trans_price': '10.23'},
     # '123056': {'bond_name': '雪榕转债', 'stock_name': '雪榕生物', 'bond_code': '123056', 'stock_code': '300511',
     #            'trans_price': '11.89'},
     # '113587': {'bond_name': '泛微转债', 'stock_name': '泛微网络', 'bond_code': '113587', 'stock_code': '603039',
     #            'trans_price': '64.33'},
-    '128097': {'bond_name': '奥佳转债', 'stock_name': '奥佳华', 'bond_code': '128097', 'stock_code': '002614',
-               'trans_price': '10.69'},
-    '128084': {'bond_name': '木森转债 ', 'stock_name': '木林森R', 'bond_code': '128084', 'stock_code': '002745',
-               'trans_price': '12.80'},
+    # '128097': {'bond_name': '奥佳转债', 'stock_name': '奥佳华', 'bond_code': '128097', 'stock_code': '002614',
+    #            'trans_price': '10.69'},
+    # '128084': {'bond_name': '木森转债 ', 'stock_name': '木林森R', 'bond_code': '128084', 'stock_code': '002745',
+    #            'trans_price': '12.80'},
     '128058': {'bond_name': '拓邦转债', 'stock_name': '拓邦股份', 'bond_code': '128058', 'stock_code': '002139',
                'trans_price': '5.47'},
     '128067': {'bond_name': '一心转债', 'stock_name': '一心堂R', 'bond_code': '128067', 'stock_code': '002727',
@@ -100,8 +108,8 @@ my_dict = {
                'trans_price': '10.36'},
     '113020': {'bond_name': '桐昆转债', 'stock_name': '桐昆股份R', 'bond_code': '113020', 'stock_code': '601233',
                'trans_price': '12.28'},
-    '113547': {'bond_name': '索发转债 ', 'stock_name': '索通发展', 'bond_code': '113547', 'stock_code': '603612',
-               'trans_price': '10.52'},
+    # '113547': {'bond_name': '索发转债 ', 'stock_name': '索通发展', 'bond_code': '113547', 'stock_code': '603612',
+    #            'trans_price': '10.52'},
     '113555': {'bond_name': '振德转债 ', 'stock_name': '振德医疗', 'bond_code': '113555', 'stock_code': '603301',
                'trans_price': '14.01'},
     '123034': {'bond_name': '通光转债 ', 'stock_name': '通光线缆', 'bond_code': '123034', 'stock_code': '300265',
@@ -124,8 +132,8 @@ my_dict = {
                'trans_price': '8.81'},
     '113024': {'bond_name': '核建转债', 'stock_name': '中国核建R', 'bond_code': '113024', 'stock_code': '601611',
                'trans_price': '9.76'},
-    '128012': {'bond_name': '辉丰转债', 'stock_name': 'ST辉丰', 'bond_code': '128012', 'stock_code': '002496',
-               'trans_price': '4.38'},
+    # '128012': {'bond_name': '辉丰转债', 'stock_name': 'ST辉丰', 'bond_code': '128012', 'stock_code': '002496',
+    #            'trans_price': '4.38'},
     '113573': {'bond_name': '纵横转债', 'stock_name': '纵横通信R', 'bond_code': '113573', 'stock_code': '603602',
                'trans_price': '18.81'},
     '127021': {'bond_name': '特发转2', 'stock_name': '特发信息R', 'bond_code': '127021', 'stock_code': '000070',
@@ -660,18 +668,15 @@ def get_premium_rt():
             stock_pctchange = data_dict[stock_code][0][2]
             stock_amount = data_dict[stock_code][0][3]
         except Exception as e:
-            print("获取数据错误",e)
+            print("获取数据错误", e)
         else:
             premium_rt = trans(stock_now, bond_now, trans_price)
             result_list.append(
-                {"bond_name": bond_name, "bond_now": bond_now, "bond_pctchange": bond_pctchange, "bond_amount": bond_amount,
+                {"bond_name": bond_name, "bond_now": bond_now, "bond_pctchange": bond_pctchange,
+                 "bond_amount": bond_amount,
                  "stock_now": stock_now, "stock_pctchange": stock_pctchange, "stock_amount": stock_amount,
                  "premium_rt": premium_rt})
     return result_list
-
-
-c.start()
-from multiprocessing import Process
 
 
 def csqCallback(quantdata):
@@ -679,6 +684,8 @@ def csqCallback(quantdata):
         if v[0][1] == None:
             continue
         data_dict[k] = v
+    result_list = get_premium_rt()
+    r.set("result", result_list)
 
 
 def get_data():
@@ -690,70 +697,9 @@ def get_data():
         time.sleep(2)
         text = input("press any key to cancel csq \r\n")
         # 取消订阅
+
         data = c.csqcancel(data.SerialID)
 
 
-class Window(tk.Tk):
-    """窗口类"""
-
-    def __init__(self, wait_time=1000, *args, **kw):
-        super().__init__()
-        self.wm_title('提醒')
-        self.configure(background='white')
-        self.wm_minsize(360, 260)  # 设置窗口最小化大小
-        self.wm_maxsize(4880, 2600)  # 设置窗口最大化大小
-        self.resizable(width=True, height=True)  # 设置窗口宽度不可变，高度可变
-
-        self.l1 = MyLabel2(height=2, width=150)
-        self.l2 = MyLabel2(height=2, width=150)
-        self.l3 = MyLabel2(height=2, width=150)
-        self.l4 = MyLabel2(height=2, width=150)
-        self.l5 = MyLabel2(height=2, width=150)
-        self.l6 = MyLabel2(height=2, width=150)
-        self.l7 = MyLabel2(height=2, width=150)
-        self.l8 = MyLabel2(height=2, width=150)
-        self.l9 = MyLabel2(height=2, width=150)
-        self.l10 = MyLabel2(height=2, width=150)
-        self.l_list = [self.l1, self.l2, self.l3, self.l4, self.l5, self.l6, self.l7, self.l8, self.l9, self.l10]
-        self.refresh_data(wait_time)
-        self.mainloop()
-
-    def refresh_data(self, wait_time=1000):
-        print(data_dict)
-        # 需要刷新数据的操作
-        # 代码...
-        # {'113581.SH': {'bond_name': '龙蟠转债', 'premium_rate': -0.1172043085441542}, '123063.SZ': {'bond_name': '大禹转债', 'premium_rate': -0.08589065112212024}}
-        data = get_premium_rt()
-        data = sorted(data, key=lambda x: x["premium_rt"])
-        self.after(wait_time, self.refresh_data)  # 这里的10000单位为毫秒
-        if len(data)<10:
-            return
-        for i in range(10):
-            bond_name = data[i]["bond_name"]
-            bond_amount = data[i]["bond_amount"]
-            stock_amount = data[i]["stock_amount"]
-            premium_rt = data[i]["premium_rt"]
-            bond_pctchange = data[i]["bond_pctchange"]
-            stock_pctchange = data[i]["stock_pctchange"]
-            bond_price = data[i]["bond_price"]
-            self.l_list[i].set(bond_name + "溢价率：" + (str(100 * premium_rt))[:6] + "%" + "转债涨跌：" + (str(
-                bond_pctchange))[:4] + "%" + "正股涨跌：" + (str(stock_pctchange))[:4] + "%" + "转债价格：" + str(bond_price)[
-                                                                                                    :6] + "转债成交额：" + str(
-                bond_amount) + "股票成交额：" + str(stock_amount))
-            if premium_rt < -0.01:
-
-                self.l_list[i].bg("red")
-            else:
-                self.l_list[i].bg("white")
-
-
 if __name__ == '__main__':
-    print(1111)
-    aa = Window()
-    proc1=Process(target=get_data,args=())
-
-    proc = Process(target=aa.refresh_data, args=())
-    proc.start()
-    proc1.start()
-    proc.join()
-    proc1.join()
+    get_data()
