@@ -1,4 +1,3 @@
-import json
 
 from script.redis_pool import r
 import tkinter as tk
