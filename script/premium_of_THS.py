@@ -372,6 +372,8 @@ my_dict = {
                'trans_price': '10.17'},
     # '120003': {'bond_name': '19华菱EBQ', 'stock_name': '华菱钢铁R', 'bond_code': '120003', 'stock_code': '000932',
     #            'trans_price': '4.68'},
+    # "113509":{"bond_name":"新泉转债","stock_name":"新泉股份","bond_code":"113509","stock_code":"603179","trans_price":"14.22"},
+
     '128096': {'bond_name': '奥瑞转债', 'stock_name': '奥瑞金R', 'bond_code': '128096', 'stock_code': '002701',
                'trans_price': '4.64'},
     '123061': {'bond_name': '航新转债', 'stock_name': '航新科技', 'bond_code': '123061', 'stock_code': '300424',

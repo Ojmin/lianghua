@@ -29,7 +29,7 @@ for filename in path_list:
                 all_value = i.split("=")[1]
             if i.find("Fundid1") != -1:
                 code = i.split('=')[1]
-            if i.find("00700") == -1:
+            if i.find("601456") == -1:
                 continue
             else:
                 info = i.strip(" ")
@@ -46,14 +46,14 @@ for filename in path_list:
             items = dict_b["PCFFile"]["Components"]['Component']
             try:
                 for item in items:
-                    if str(item["UnderlyingSecurityID"]) == "00700":
+                    if str(item["UnderlyingSecurityID"]) == "601456":
                         code = dict_b["PCFFile"]["SecurityID"]
                         NAVperCU = dict_b["PCFFile"]["NAVperCU"]
                         info = json.dumps(item)
                         with open("result.txt", "a+", encoding="utf-8") as f:
                             f.write("xml: "+"code:" + code + "\n" + "NAVperCU:" + NAVperCU + "\n" + "提取的信息:" + info + "\n")
             except:
-                if str(items["UnderlyingSecurityID"]) == "00700":
+                if str(items["UnderlyingSecurityID"]) == "601456":
                     code = dict_b["PCFFile"]["SecurityID"]
                     NAVperCU = dict_b["PCFFile"]["NAVperCU"]
                     info = json.dumps(item)
@@ -70,7 +70,7 @@ for filename in path_list:
                 all_value = i.split("=")[1]
             if i.find("FundID") != -1:
                 code = i.split('=')[1]
-            if i.find("00700") == -1:
+            if i.find("601456") == -1:
                 continue
             else:
                 info = i.strip(" ")
